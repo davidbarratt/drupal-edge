@@ -53,3 +53,13 @@ function davidwbarratt_remove_gallery_css( $css ) {
 	return preg_replace( "#<style type='text/css'>(.*?)</style>#s", '', $css );
 }
 add_filter( 'gallery_style', 'davidwbarratt_remove_gallery_css' );
+
+function davidwbarratt_excerpt_length( $length ) {
+	return 100;
+}
+add_filter( 'excerpt_length', 'davidwbarratt_excerpt_length');
+
+function davidwbarratt_excerpt_more( $more ) {
+	return '... <a class="read-more" href="'. get_permalink( get_the_ID() ) . '">Read More</a>';
+}
+add_filter( 'excerpt_more', 'davidwbarratt_excerpt_more' );

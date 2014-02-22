@@ -62,5 +62,3 @@
 			</div>
 			<div class="clear"></div>
 			<div class="hr grid_16"></div>
-			<div class="clear"></div>
-			<?php get_sidebar('top'); ?>

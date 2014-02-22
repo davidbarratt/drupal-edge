@@ -17,15 +17,9 @@
 					</div>
 				</div>
 				<div class="hr"></div>
-				<?php if ( is_archive() || is_search() || is_tag()) : ?>
-					<div class="entry-summary">
-						<?php the_excerpt(); ?>
-					</div>
-				<?php else : ?>
 				<div class="entry-content">
-					<?php the_content( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'davidwbarratt' ) ); ?>
+					<?php the_excerpt(); ?>
 				</div>
-				<?php endif; ?>
 				<h4 class="comments-title"><a href="<?php the_permalink(); ?>#comments"><?php print get_comments_number(); ?> Comments</a></h4>
 			</div>
 		<?php endwhile; ?>
