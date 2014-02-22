@@ -25,6 +25,10 @@ body {
 	font-size: 10px;
 }
 
+p {
+  margin: 0 0 1em 0;
+}
+
 div {
 	margin: 0;
 	padding: 0;
@@ -109,13 +113,21 @@ img {
 /* Post */
 
 .entry-title {
-	margin: 28px 0 5px 0;
+  font-size: 2.2em;
+  line-height: 1.2em;
+	margin: 1em 0 0 0;
 	float: left;
+	max-width: 80%;
 }
 
 .post-meta {
 	float: right;
-	margin: 2.3em 0 0 0;
+	margin: 3em 0 0 0;
+}
+
+.entry-content {
+  font-size: 1.5em;
+  line-height: 1.8em;
 }
 
 #container .post-date {
@@ -173,6 +185,7 @@ img {
 
 #container .hr {
   clear: both;
+  margin-bottom: 1em;
 	border-bottom: #fff 3px solid;
 }
 
@@ -312,12 +325,8 @@ img {
 }
 
 .alignleft {
-	clear: left;
-	float: left;
-	margin: 0 15px 15px 0;
-}
-
-.alignleft {
-	margin-top: 20px;
+	clear: right;
+	float: right;
+	margin: 2em 0 1em 1em;
 }
 		
