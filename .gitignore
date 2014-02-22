@@ -1,0 +1,11 @@
+web/wp-content/uploads/
+web/wp-content/blogs.dir/
+web/wp-content/upgrade/
+web/wp-content/backup-db/
+web/wp-content/advanced-cache.php
+web/wp-content/wp-cache-config.php
+web/sitemap.xml
+web/wp-content/cache/
+web/wp-content/backups/
+web/wp-config.php
+
