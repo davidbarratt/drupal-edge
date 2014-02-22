@@ -16,7 +16,6 @@
 					<div class="post-date">
 						<?php print get_the_date('F j Y'); ?> at <?php print get_the_date('g:ia'); ?>
 					</div>
-					<?php include('share.php'); ?>
 				</div>
 				<?php if ( is_archive() || is_search() || is_tag()) : ?>
 					<div class="entry-summary">

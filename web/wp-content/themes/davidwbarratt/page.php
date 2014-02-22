@@ -5,7 +5,6 @@
 			<h2 class="entry-title"><?php the_title(); ?></h2>
 				<div class="hr"></div>
 				<div class="post-meta">
-					<?php include('share.php'); ?>
 				</div>
 			<div class="entry-content">
 				<?php the_content(); ?>

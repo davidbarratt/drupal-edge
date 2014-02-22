@@ -8,7 +8,6 @@
 					<div class="post-date">
 						<?php print get_the_date('F j Y'); ?> at <?php print get_the_date('g:ia'); ?>
 					</div>
-					<?php include('share.php'); ?>
 				</div>
 				<div class="entry-content">
 					<?php the_content( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'davidwbarratt' ) ); ?>
