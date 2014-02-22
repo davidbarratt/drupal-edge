@@ -15,11 +15,11 @@ Version: 1.0
 
 body {
 	background: url('img/background.jpg') no-repeat fixed #000;
-	background-size: 100% auto;
-	-o-background-size: 100% auto;
-	-webkit-background-size: 100% auto;
-	-khtml-background-size: 100% auto;
-	-moz-background-size: 100% auto;
+	background-size: cover;
+	-o-background-size: cover;
+	-webkit-background-size: cover;
+	-khtml-background-size: cover;
+	-moz-background-size: cover;
 	margin: 0;
 	padding: 0;
 }
@@ -109,16 +109,16 @@ img {
 
 .entry-title {
 	margin: 28px 0 5px 0;
+	float: left;
 }
 
 .post-meta {
 	float: right;
-	margin: 1em 0 1em 2em;
+	margin: 2.3em 0 0 0;
 }
 
 #container .post-date {
-	float: right;
-	margin: 0 0 5px 0;
+	margin: 0;
 }
 
 #container .share {
@@ -171,6 +171,7 @@ img {
 }
 
 #container .hr {
+  clear: both;
 	border-bottom: #fff 3px solid;
 }
 

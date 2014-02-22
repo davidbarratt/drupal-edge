@@ -11,13 +11,12 @@
 		<?php while ( have_posts() ) : the_post(); ?>
 			<div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 				<h2 class="entry-title"><a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>" ><?php the_title(); ?></a></h2>
-				<div class="hr"></div>
 				<div class="post-meta">
 					<div class="post-date">
-						<?php print get_the_date('F j Y'); ?> at <?php print get_the_date('g:ia'); ?>
+						<?php print get_the_date('F j Y'); ?>
 					</div>
-					<?php include('share.php'); ?>
 				</div>
+				<div class="hr"></div>
 				<?php if ( is_archive() || is_search() || is_tag()) : ?>
 					<div class="entry-summary">
 						<?php the_excerpt(); ?>
