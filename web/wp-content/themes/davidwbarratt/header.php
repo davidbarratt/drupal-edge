@@ -6,9 +6,15 @@
 		<script type="text/javascript" src="<?php bloginfo('template_directory'); ?>/js/jquery-1.4.2.min.js"></script>
 		<link rel="stylesheet" href="<?php bloginfo('stylesheet_url'); ?>" type="text/css" media="screen" />
 		<?php wp_head(); ?>
+		<?php $description = ''; ?>
 		<?php if (is_single()) { ?>
 			<?php while ( have_posts() ) : the_post(); ?>
-			<?php if (has_post_thumbnail()) { 
+			<?php
+			  
+			  $post = get_post();
+			  $description = wp_strip_all_tags($post->post_excerp);
+			  
+			  if (has_post_thumbnail()) { 
 				$getimage = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full');
 				$ogimage = $getimage[0];
 			} elseif (is_attachment()) {
@@ -24,7 +30,7 @@
 		<meta name="og:title" content="<?php the_title(); ?>" />
 		<meta name="og:type" content="article" />
 		<meta name="og:image" content="<?php print $ogimage; ?>" />
-		<meta name="og:description" content="<?php the_excerpt_rss() ?>" />
+		<meta name="og:description" content="<?php echo esc_attr( $description ); ?>" />
 		<meta name="og:url" content="<?php the_permalink(); ?>" />
 		<meta name="og:site_name" content="<?php bloginfo('name'); ?>" />
 		<meta name="fb:admins" content="211800900" />
