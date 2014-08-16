@@ -7,6 +7,12 @@
 	-khtml-border-radius: 11px;
 	margin-bottom: 20px;
 	height: 410px;
+	z-index: 1;
+}
+
+.slideshow-window.slideshow-white {
+	background-color: #fff;
+	border-color: #fff;
 }
 
 .slideshow-window, .slideshow-window * {
@@ -49,7 +55,7 @@ body div.slideshow-window * img {
 }
 
 .slideshow-line-height-hack {
-	overflow: hide;
+	overflow: hidden;
 	width: 0px;
 	font-size: 0px;
 }

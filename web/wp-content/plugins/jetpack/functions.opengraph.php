@@ -28,7 +28,7 @@ function jetpack_og_tags() {
 
 	if ( is_home() || is_front_page() ) {
 		$site_type              = get_option( 'open_graph_protocol_site_type' );
-		$tags['og:type']        = ! empty( $site_type ) ? $site_type : 'blog';
+		$tags['og:type']        = ! empty( $site_type ) ? $site_type : 'website';
 		$tags['og:title']       = get_bloginfo( 'name' );
 		$tags['og:description'] = get_bloginfo( 'description' );
 
@@ -49,7 +49,11 @@ function jetpack_og_tags() {
 		$author = get_queried_object();
 
 		$tags['og:title']           = $author->display_name;
-		$tags['og:url']             = get_author_posts_url( $author->ID );
+		if ( ! empty( $author->user_url ) ) {
+			$tags['og:url']     = $author->user_url;
+		} else {
+			$tags['og:url']     = get_author_posts_url( $author->ID );
+		}
 		$tags['og:description']     = $author->description;
 		$tags['profile:first_name'] = get_the_author_meta( 'first_name', $author->ID );
 		$tags['profile:last_name']  = get_the_author_meta( 'last_name', $author->ID );
@@ -63,25 +67,43 @@ function jetpack_og_tags() {
 		$tags['og:url']         = get_permalink( $data->ID );
 		if ( !post_password_required() )
 			$tags['og:description'] = ! empty( $data->post_excerpt ) ? preg_replace( '@https?://[\S]+@', '', strip_shortcodes( wp_kses( $data->post_excerpt, array() ) ) ): wp_trim_words( preg_replace( '@https?://[\S]+@', '', strip_shortcodes( wp_kses( $data->post_content, array() ) ) ) );
-		$tags['og:description'] = empty( $tags['og:description'] ) ? ' ' : $tags['og:description'];
+		if ( empty( $tags['og:description'] ) )
+			$tags['og:description'] = __('Visit the post for more.', 'jetpack');
+		$tags['article:published_time'] = date( 'c', strtotime( $data->post_date_gmt ) );
+		$tags['article:modified_time'] = date( 'c', strtotime( $data->post_modified_gmt ) );
+		if ( post_type_supports( get_post_type( $data ), 'author' ) && isset( $data->post_author ) ) {
+			$publicize_facebook_user = get_post_meta( $data->ID, '_publicize_facebook_user', true );
+			if ( ! empty( $publicize_facebook_user ) ) {
+				$tags['article:author'] = esc_url( $publicize_facebook_user );
+			} else {
+				$tags['article:author'] = get_author_posts_url( $data->post_author );
+			}
+		}
 	}
+
+	// Allow plugins to inject additional template-specific open graph tags
+	$tags = apply_filters( 'jetpack_open_graph_base_tags', $tags, compact( 'image_width', 'image_height' ) );
 
 	// Re-enable widont if we had disabled it
 	if ( $disable_widont )
 		add_filter( 'the_title', 'widont' );
 
-	if ( empty( $tags ) )
+	if ( empty( $tags ) && apply_filters( 'jetpack_open_graph_return_if_empty', true ) )
 		return;
 
 	$tags['og:site_name'] = get_bloginfo( 'name' );
-	$tags['og:image']     = jetpack_og_get_image( $image_width, $image_height );
+
+	if ( !post_password_required() )
+		$tags['og:image']     = jetpack_og_get_image( $image_width, $image_height );
 
 	// Facebook whines if you give it an empty title
 	if ( empty( $tags['og:title'] ) )
 		$tags['og:title'] = __( '(no title)', 'jetpack' );
 
 	// Shorten the description if it's too long
-	$tags['og:description'] = strlen( $tags['og:description'] ) > $description_length ? mb_substr( $tags['og:description'], 0, $description_length ) . '...' : $tags['og:description'];
+	if ( isset( $tags['og:description'] ) ) {
+		$tags['og:description'] = strlen( $tags['og:description'] ) > $description_length ? mb_substr( $tags['og:description'], 0, $description_length ) . '...' : $tags['og:description'];
+	}
 
 	// Add any additional tags here, or modify what we've come up with
 	$tags = apply_filters( 'jetpack_open_graph_tags', $tags, compact( 'image_width', 'image_height' ) );
@@ -92,7 +114,7 @@ function jetpack_og_tags() {
 	$secure_image_num = 0;
 
 	foreach ( (array) $tags as $tag_property => $tag_content ) {
-		// to accomodate multiple images
+		// to accommodate multiple images
 		$tag_content = (array) $tag_content;
 		$tag_content = array_unique( $tag_content );
 
@@ -117,7 +139,6 @@ function jetpack_og_tags() {
 			}
 		}
 	}
-
 	echo $og_output;
 }
 
@@ -181,7 +202,7 @@ function jetpack_og_get_image( $width = 200, $height = 200, $max_images = 4 ) { 
 
 	// Second fall back, blank image
 	if ( empty( $image ) ) {
-		$image[] = "http://wordpress.com/i/blank.jpg";
+		$image[] = apply_filters( 'jetpack_open_graph_image_default', "http://wordpress.com/i/blank.jpg" );
 	}
 
 	return $image;

@@ -72,7 +72,9 @@ function vimeo_shortcode( $atts ) {
 	if ( ! $height )
 		$height = round( ( $width / 640 ) * 360 );
 
-	$html = "<div class='embed-vimeo' style='text-align:center;'><iframe src='http://player.vimeo.com/video/$id' width='$width' height='$height' frameborder='0'></iframe></div>";
+	$url = esc_url( set_url_scheme( "http://player.vimeo.com/video/$id" ) );
+
+	$html = "<div class='embed-vimeo' style='text-align:center;'><iframe src='$url' width='$width' height='$height' frameborder='0'></iframe></div>";
 	$html = apply_filters( 'video_embed_html', $html );
 	return $html;
 }
@@ -83,7 +85,7 @@ function vimeo_embed_to_shortcode( $content ) {
 	if ( false === stripos( $content, 'player.vimeo.com/video/' ) )
 		return $content;
 
-	$regexp = '!<iframe\s+src=[\'"]http://player\.vimeo\.com/video/(\d+)[\'"]((?:\s+\w+=[\'"][^\'"]*[\'"])*)></iframe>!i';
+	$regexp = '!<iframe\s+src=[\'"](https?:)?//player\.vimeo\.com/video/(\d+)[\w=&;?]*[\'"]((?:\s+\w+=[\'"][^\'"]*[\'"])*)((?:[\s\w]*))></iframe>!i';
 	$regexp_ent = str_replace( '&amp;#0*58;', '&amp;#0*58;|&#0*58;', htmlspecialchars( $regexp, ENT_NOQUOTES ) );
 
 	foreach ( array( 'regexp', 'regexp_ent' ) as $reg ) {
@@ -91,9 +93,9 @@ function vimeo_embed_to_shortcode( $content ) {
 			continue;
 
 		foreach ( $matches as $match ) {
-			$id = (int) $match[1];
+			$id = (int) $match[2];
 
-			$params = $match[2];
+			$params = $match[3];
 
 			if ( 'regexp_ent' == $reg )
 				$params = html_entity_decode( $params );

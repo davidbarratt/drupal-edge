@@ -1,8 +1,8 @@
 <?php
 /**
  * Module Name: Subscriptions
- * Module Description: Allow users to subscribe to your posts and comments to receive a notification via email.
- * Sort Order: 3
+ * Module Description: Allow users to subscribe to your posts and comments and receive notifications via email.
+ * Sort Order: 9
  * First Introduced: 1.2
  * Requires Connection: Yes
  * Auto Activate: Yes
@@ -249,18 +249,20 @@ class Jetpack_Subscriptions {
 	}
 
 	public function reading_section() {
+		echo '<p id="follower-settings">';
 		_e( 'These settings change emails sent from your blog to followers.', 'jetpack' );
+		echo '</p>';
 	}
 
 	public function setting_invitation() {
 		$settings = $this->get_settings();
-		echo '<textarea name="subscription_options[invitation]" class="large-text" cols="50" rows="5">'.$settings['invitation'].'</textarea>';
+		echo '<textarea name="subscription_options[invitation]" class="large-text" cols="50" rows="5">' . esc_textarea( $settings['invitation'] ) . '</textarea>';
 		echo '<p><span class="description">'.__( 'Introduction text sent when someone follows your blog. (Site and confirmation details will be automatically added for you.)', 'jetpack' ).'</span></p>';
 	}
 
 	public function setting_comment_follow() {
 		$settings = $this->get_settings();
-		echo '<textarea name="subscription_options[comment_follow]" class="large-text" cols="50" rows="5">'.$settings['comment_follow'].'</textarea>';
+		echo '<textarea name="subscription_options[comment_follow]" class="large-text" cols="50" rows="5">' . esc_textarea( $settings['comment_follow'] ) . '</textarea>';
 		echo '<p><span class="description">'.__( 'Introduction text sent when someone follows a post on your blog. (Site and confirmation details will be automatically added for you.)', 'jetpack' ).'</span></p>';
 	}
 
@@ -469,14 +471,14 @@ class Jetpack_Subscriptions {
 		if ( FALSE === has_filter( 'comment_form', 'show_subscription_checkbox' ) && 1 == get_option( 'stc_enabled', 1 ) ) {
 			// Subscribe to comments checkbox
 			$str .= '<p class="comment-subscription-form"><input type="checkbox" name="subscribe_comments" id="subscribe_comments" value="subscribe" style="width: auto; -moz-appearance: checkbox; -webkit-appearance: checkbox;"' . $comments_checked . ' /> ';
-			$str .= '<label class="subscribe-label" id="subscribe-label" for="subscribe_comments" style="display: inline;">' . __( 'Notify me of follow-up comments by email.', 'jetpack' ) . '</label>';
+			$str .= '<label class="subscribe-label" id="subscribe-label" for="subscribe_comments">' . __( 'Notify me of follow-up comments by email.', 'jetpack' ) . '</label>';
 			$str .= '</p>';
 		}
 
 		if ( 1 == get_option( 'stb_enabled', 1 ) ) {
 			// Subscribe to blog checkbox
 			$str .= '<p class="comment-subscription-form"><input type="checkbox" name="subscribe_blog" id="subscribe_blog" value="subscribe" style="width: auto; -moz-appearance: checkbox; -webkit-appearance: checkbox;"' . $blog_checked . ' /> ';
-			$str .=	'<label class="subscribe-label" id="subscribe-blog-label" for="subscribe_blog" style="display: inline;">' . __( 'Notify me of new posts by email.', 'jetpack' ) . '</label>';
+			$str .=	'<label class="subscribe-label" id="subscribe-blog-label" for="subscribe_blog">' . __( 'Notify me of new posts by email.', 'jetpack' ) . '</label>';
 			$str .= '</p>';
 		}
 
@@ -563,16 +565,16 @@ class Jetpack_Subscriptions_Widget extends WP_Widget {
 	}
 
 	function maybe_add_style() {
-	    if ( is_active_widget( false, false, $this->id_base, true ) ) {
+	    //if ( is_active_widget( false, false, $this->id_base, true ) ) {
 		wp_register_style( 'jetpack-subscriptions', plugins_url( 'subscriptions/subscriptions.css', __FILE__ ) );
 		wp_enqueue_style( 'jetpack-subscriptions' );
-	    }
+	    //}
 	}
 
 	function widget( $args, $instance ) {
 		global $current_user;
 
-		
+
 
 		$source                 = 'widget';
 		$instance            	= wp_parse_args( (array) $instance, $this->defaults() );
@@ -591,7 +593,7 @@ class Jetpack_Subscriptions_Widget extends WP_Widget {
 		echo $args['before_widget'];
 		echo $args['before_title'] . '<label for="' . esc_attr( $subscribe_field_id ) . '">' . esc_attr( $instance['title'] ) . '</label>' . $args['after_title'] . "\n"; 
 
-		$referer = ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		$referer = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
 
 		// Check for subscription confirmation.
 		if ( isset( $_GET['subscribe'] ) && 'success' == $_GET['subscribe'] ) : ?>
@@ -621,7 +623,7 @@ class Jetpack_Subscriptions_Widget extends WP_Widget {
 		endif;
 
 		// Display a subscribe form ?>
-		<form action="" method="post" accept-charset="utf-8" id="subscribe-blog-<?php echo $widget_id; ?>">
+		<form action="#" method="post" accept-charset="utf-8" id="subscribe-blog-<?php echo $widget_id; ?>">
 			<?php
 			if ( ! isset ( $_GET['subscribe'] ) ) {
 				?><p id="subscribe-text"><?php echo $subscribe_text ?></p><?php

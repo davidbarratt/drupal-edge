@@ -92,34 +92,45 @@ function flickr_shortcode_handler( $atts ) {
 		'size'      => 0,
 	), $atts );
 
-	if ( isset( $atts['video'] ) ) {
+	if ( ! empty( $atts['video'] ) ) {
 		$showing = 'video';
 		$src = $atts['video'];
-	} elseif ( isset( $atts['photo'] ) ) {
+	} elseif ( ! empty( $atts['photo'] ) ) {
 		$showing = 'photo';
 		$src = $atts['photo'];
 	} else {
 		return '';
 	}
 
-	if ( preg_match( "!photos/(([0-9a-zA-Z-_]+)|([0-9]+@N[0-9]+))/([0-9]+)/?$!", $src, $m ) )
-		$atts['photo_id'] = $m[4];
-	else
-		$atts['photo_id'] = $atts['video'];
-
-	if ( $showing == 'video' ) {
-		if ( ! isset( $atts['show_info'] ) || in_array( $atts['show_info'], array('yes', 'true') ) )
-			$atts['show_info'] = 'true';
-		elseif ( in_array( $atts['show_info'], array( 'false', 'no' ) ) )
-			$atts['show_info'] = 'false';
-
-    	if ( isset( $atts['secret'] ) )
-		$atts['secret'] = preg_replace( '![^\w]+!i', '', $atts['secret'] );
-
-		return flickr_shortcode_video_markup( $atts );
-	} else {
+	if ( ! preg_match( '~^(https?:)?//([^/]+.)?((static)?flickr.com|flic.kr)/.*~i', $src ) ) {
 		return '';
 	}
+
+	if ( $showing == 'video' ) {
+
+		if ( preg_match( "!photos/(([0-9a-zA-Z-_]+)|([0-9]+@N[0-9]+))/([0-9]+)/?$!", $src, $m ) ) {
+			$atts['photo_id'] = $m[4];
+		} else {
+			$atts['photo_id'] = $atts['video'];
+		}
+
+		if ( ! isset( $atts['show_info'] ) || in_array( $atts['show_info'], array('yes', 'true') ) ) {
+			$atts['show_info'] = 'true';
+		} elseif ( in_array( $atts['show_info'], array( 'false', 'no' ) ) ) {
+			$atts['show_info'] = 'false';
+		}
+
+		if ( isset( $atts['secret'] ) ) {
+			$atts['secret'] = preg_replace( '![^\w]+!i', '', $atts['secret'] );
+		}
+
+		return flickr_shortcode_video_markup( $atts );
+	} elseif ( 'photo' == $showing ) {
+		$src = sprintf( '%s/player/', untrailingslashit( $src ) );
+	
+		return sprintf( '<iframe src="%s" height="%s" width="%s"  frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>', esc_url( $src ), esc_attr( $atts['h'] ), esc_attr( $atts['w'] ) );
+	}
+
 }
 
 function flickr_shortcode_video_markup( $atts ) {
@@ -135,3 +146,30 @@ EOD;
 }
 
 add_shortcode( 'flickr', 'flickr_shortcode_handler' );
+
+// Override core's Flickr support because Flickr oEmbed doesn't support web embeds
+wp_embed_register_handler( 'flickr', '#https?://(www\.)?flickr\.com/.*#i', 'jetpack_flickr_oembed_handler' );
+
+function jetpack_flickr_oembed_handler( $matches, $attr, $url ) {
+	// Legacy slideshow embeds end with /show/
+	// e.g. http://www.flickr.com/photos/yarnaholic/sets/72157615194738969/show/
+	if ( '/show/' !== substr( $url, -strlen( '/show/' ) ) ) {			
+		// These lookups need cached, as they don't use WP_Embed (which caches)
+		$found;
+
+		$cache_key 		= md5( $url . serialize( $attr ) );
+		$cache_group 	= 'oembed_flickr';
+
+		$html = wp_cache_get( $cache_key, $cache_group, null, $found );
+
+		if ( false === $found ) {
+			$html = _wp_oembed_get_object()->get_html( $url, $attr );
+
+			wp_cache_set( $cache_key, $html, $cache_group, 60 * MINUTE_IN_SECONDS );
+		}
+
+		return $html;
+	}
+
+	return flickr_shortcode_handler( array( 'photo' => $url ) );
+}	
