@@ -1,1 +1,0 @@
-[27-Dec-2013 10:56:33 America/New_York] PHP Fatal error:  Call to undefined function get_header() in /home/david/www/web/wp-content/themes/twentytwelve/404.php on line 10
