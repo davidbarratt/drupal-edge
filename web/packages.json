@@ -1,0 +1,41 @@
+{
+  "package": {
+    "name": "drupal/drupal",
+    "description": "Drupal is an open source content management platform powering millions of websites and applications.",
+    "type": "project",
+    "license": "GPL-2.0+",
+    "version": "dev-master",
+    "require": {
+      "davidbarratt/custom-installer": "~1.0",
+      "drupal/core": "~8.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+      {
+        "type": "vcs",
+        "url": "git@github.com:davidbarratt/drupal-core.git"
+      }
+    ],
+    "config": {
+      "preferred-install": "dist",
+      "autoloader-suffix": "Drupal8"
+    },
+    "extra": {
+      "custom-installer": {
+        "drupal-core": "core"
+      },
+      "_readme": [
+        "This is an example file to show how a Drupal website can be managed via",
+        "Composer. It does not work out of the box but requires a Git subtree",
+        "split of the core directory to be added to the repositories",
+        "section above."
+      ]
+    },
+    "source": {
+      "url": "https://github.com/davidbarratt/drupal8.git",
+      "type": "git",
+      "reference": "master"
+    }
+  }
+}
