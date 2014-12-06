@@ -45,7 +45,7 @@
         "description": "Drupal is an open source content management platform powering millions of websites and applications.",
         "type": "project",
         "license": "GPL-2.0+",
-        "version": "dev-master",
+        "version": "dev-kitchen-sink",
         "require": {
           "davidbarratt/custom-installer": "~1.0",
           "drupal/core": "~8.0",
@@ -88,7 +88,7 @@
         "source": {
           "url": "https://github.com/davidbarratt/drupal8.git",
           "type": "git",
-          "reference": "master"
+          "reference": "kitchen-sink"
         }
       }
     },
