@@ -110,7 +110,7 @@
           "composer/installers": "~1.0",
           "drupal/core": "~8.0",
           "symm/guzzle-bitpay": "~1.0"
-        }
+        },
         "source": {
           "url": "https://github.com/davidbarratt/test2",
           "type": "git",
