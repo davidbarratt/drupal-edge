@@ -83,6 +83,40 @@
           "reference": "8.x-1.x"
         }
       }
+    },
+    "davidbarratt/test1": {
+      "8.0.1": {
+        "name": "davidbarratt/test1",
+        "type": "drupal-module",
+        "version": "8.0.1",
+        "require": {
+          "composer/installers": "~1.0",
+          "drupal/core": "~8.0",
+          "knplabs/github-api": "~1.2"
+        },
+        "source": {
+          "url": "https://github.com/davidbarratt/test1",
+          "type": "git",
+          "reference": "8.0.1"
+        }
+      }
+    },
+    "davidbarratt/test2": {
+      "8.0.0": {
+        "name": "davidbarratt/test2",
+        "type": "drupal-module",
+        "version": "8.0.0",
+        "require": {
+          "composer/installers": "~1.0",
+          "drupal/core": "~8.0",
+          "symm/guzzle-bitpay": "~1.0"
+        }
+        "source": {
+          "url": "https://github.com/davidbarratt/test2",
+          "type": "git",
+          "reference": "8.0.0"
+        }
+      }
     }
   }
 }
