@@ -40,6 +40,45 @@
           "reference": "master"
         }
       }
+    },
+    "drupal/xero": {
+      "8.0.0": {
+        "name": "drupal/xero",
+        "type": "drupal-module",
+        "descirption": "Xero module provides integration with the Xero API and Drupal.",
+        "homepage": "http://drupal.org/project/xero",
+        "license": "GPL-2.0",
+        "version": "8.0.0",
+        "require": {
+            "blackoptic/xerobundle": "dev-no-bundle-support as master"
+        },
+        "repositories": [
+            {
+                "type": "vcs",
+                "url": "https://github.com/mradcliffe/xerobundle"
+            }
+        ],
+        "source": {
+          "url": "http://git.drupal.org/project/xero.git",
+          "type": "git",
+          "reference": "8.x-1.x"
+        }
+      }
+    },
+    "drupal/omnipay": {
+      "8.0.0": {
+        "name": "drupal/omnipay",
+        "type": "drupal-module",
+        "version": "8.0.0",
+        "require": {
+          "omnipay/omnipay": "1.1.*"
+        },
+        "source": {
+          "url": "http://git.drupal.org/project/omnipay.git",
+          "type": "git",
+          "reference": "8.x-1.x"
+        }
+      }
     }
   }
 }
