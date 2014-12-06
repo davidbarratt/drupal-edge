@@ -50,6 +50,8 @@
         "license": "GPL-2.0",
         "version": "8.0.0",
         "require": {
+            "composer/installers": "~1.0",
+            "drupal/core": "~8.0",
             "blackoptic/xerobundle": "dev-no-bundle-support as master"
         },
         "repositories": [
@@ -71,6 +73,8 @@
         "type": "drupal-module",
         "version": "8.0.0",
         "require": {
+          "composer/installers": "~1.0",
+          "drupal/core": "~8.0",
           "omnipay/omnipay": "1.1.*"
         },
         "source": {
