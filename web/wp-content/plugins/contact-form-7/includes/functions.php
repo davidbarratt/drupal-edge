@@ -5,10 +5,11 @@ function wpcf7_plugin_path( $path = '' ) {
 }
 
 function wpcf7_plugin_url( $path = '' ) {
-	$url = untrailingslashit( WPCF7_PLUGIN_URL );
+	$url = plugins_url( $path, WPCF7_PLUGIN );
 
-	if ( ! empty( $path ) && is_string( $path ) && false === strpos( $path, '..' ) )
-		$url .= '/' . ltrim( $path, '/' );
+	if ( is_ssl() && 'http:' == substr( $url, 0, 5 ) ) {
+		$url = 'https:' . substr( $url, 5 );
+	}
 
 	return $url;
 }
@@ -40,26 +41,25 @@ function wpcf7_l10n() {
 		'sq' => __( 'Albanian', 'contact-form-7' ),
 		'ar' => __( 'Arabic', 'contact-form-7' ),
 		'hy_AM' => __( 'Armenian', 'contact-form-7' ),
-		'az_AZ' => __( 'Azerbaijani', 'contact-form-7' ),
+		'az' => __( 'Azerbaijani', 'contact-form-7' ),
 		'bn_BD' => __( 'Bangla', 'contact-form-7' ),
 		'eu' => __( 'Basque', 'contact-form-7' ),
 		'be_BY' => __( 'Belarusian', 'contact-form-7' ),
-		'bs' => __( 'Bosnian', 'contact-form-7' ),
-		'pt_BR' => __( 'Brazilian Portuguese', 'contact-form-7' ),
+		'bs_BA' => __( 'Bosnian', 'contact-form-7' ),
 		'bg_BG' => __( 'Bulgarian', 'contact-form-7' ),
 		'ca' => __( 'Catalan', 'contact-form-7' ),
 		'ckb' => __( 'Central Kurdish', 'contact-form-7' ),
-		'zh_CN' => __( 'Chinese (Simplified)', 'contact-form-7' ),
-		'zh_TW' => __( 'Chinese (Traditional)', 'contact-form-7' ),
+		'zh_CN' => __( 'Chinese (China)', 'contact-form-7' ),
+		'zh_TW' => __( 'Chinese (Taiwan)', 'contact-form-7' ),
 		'hr' => __( 'Croatian', 'contact-form-7' ),
 		'cs_CZ' => __( 'Czech', 'contact-form-7' ),
 		'da_DK' => __( 'Danish', 'contact-form-7' ),
 		'nl_NL' => __( 'Dutch', 'contact-form-7' ),
-		'en_US' => __( 'English', 'contact-form-7' ),
+		'en_US' => __( 'English (United States)', 'contact-form-7' ),
 		'eo_EO' => __( 'Esperanto', 'contact-form-7' ),
 		'et' => __( 'Estonian', 'contact-form-7' ),
 		'fi' => __( 'Finnish', 'contact-form-7' ),
-		'fr_FR' => __( 'French', 'contact-form-7' ),
+		'fr_FR' => __( 'French (France)', 'contact-form-7' ),
 		'gl_ES' => __( 'Galician', 'contact-form-7' ),
 		'gu_IN' => __( 'Gujarati', 'contact-form-7' ),
 		'ka_GE' => __( 'Georgian', 'contact-form-7' ),
@@ -81,17 +81,19 @@ function wpcf7_l10n() {
 		'ms_MY' => __( 'Malay', 'contact-form-7' ),
 		'ml_IN' => __( 'Malayalam', 'contact-form-7' ),
 		'mt_MT' => __( 'Maltese', 'contact-form-7' ),
-		'nb_NO' => __( 'Norwegian', 'contact-form-7' ),
+		'nb_NO' => __( 'Norwegian (Bokmål)', 'contact-form-7' ),
 		'fa_IR' => __( 'Persian', 'contact-form-7' ),
 		'pl_PL' => __( 'Polish', 'contact-form-7' ),
-		'pt_PT' => __( 'Portuguese', 'contact-form-7' ),
+		'pt_BR' => __( 'Portuguese (Brazil)', 'contact-form-7' ),
+		'pt_PT' => __( 'Portuguese (Portugal)', 'contact-form-7' ),
+		'pa_IN' => __( 'Punjabi', 'contact-form-7' ),
 		'ru_RU' => __( 'Russian', 'contact-form-7' ),
 		'ro_RO' => __( 'Romanian', 'contact-form-7' ),
 		'sr_RS' => __( 'Serbian', 'contact-form-7' ),
 		'si_LK' => __( 'Sinhala', 'contact-form-7' ),
 		'sk_SK' => __( 'Slovak', 'contact-form-7' ),
 		'sl_SI' => __( 'Slovene', 'contact-form-7' ),
-		'es_ES' => __( 'Spanish', 'contact-form-7' ),
+		'es_ES' => __( 'Spanish (Spain)', 'contact-form-7' ),
 		'sv_SE' => __( 'Swedish', 'contact-form-7' ),
 		'ta' => __( 'Tamil', 'contact-form-7' ),
 		'th' => __( 'Thai', 'contact-form-7' ),
@@ -124,9 +126,6 @@ function wpcf7_is_rtl( $locale = '' ) {
 
 function wpcf7_ajax_loader() {
 	$url = wpcf7_plugin_url( 'images/ajax-loader.gif' );
-
-	if ( is_ssl() && 'http:' == substr( $url, 0, 5 ) )
-		$url = 'https:' . substr( $url, 5 );
 
 	return apply_filters( 'wpcf7_ajax_loader', $url );
 }
@@ -215,6 +214,12 @@ function wpcf7_format_atts( $atts ) {
 	}
 
 	foreach ( $atts as $key => $value ) {
+		$key = strtolower( trim( $key ) );
+
+		if ( ! preg_match( '/^[a-z_:][a-z_:.0-9-]*$/', $key ) ) {
+			continue;
+		}
+
 		$value = trim( $value );
 
 		if ( '' !== $value ) {
@@ -273,7 +278,7 @@ function wpcf7_load_modules() {
 		'acceptance', 'flamingo',
 		'akismet', 'jetpack', 'submit', 'captcha', 'number',
 		'text', 'checkbox', 'quiz', 'textarea', 'date',
-		'response', 'file', 'select', 'listo' );
+		'response', 'file', 'select', 'listo', 'count' );
 
 	foreach ( $mods as $mod ) {
 		$file = trailingslashit( $dir ) . $mod . '.php';
@@ -361,6 +366,92 @@ function wpcf7_enctype_value( $enctype ) {
 	}
 
 	return '';
+}
+
+function wpcf7_rmdir_p( $dir ) {
+	if ( is_file( $dir ) ) {
+		@unlink( $dir );
+		return true;
+	}
+
+	if ( ! is_dir( $dir ) ) {
+		return false;
+	}
+
+	if ( $handle = @opendir( $dir ) ) {
+		while ( false !== ( $file = readdir( $handle ) ) ) {
+			if ( $file == "." || $file == ".." ) {
+				continue;
+			}
+
+			wpcf7_rmdir_p( path_join( $dir, $file ) );
+		}
+
+		closedir( $handle );
+	}
+
+	return @rmdir( $dir );
+}
+
+/* From _http_build_query in wp-includes/functions.php */
+function wpcf7_build_query( $args, $key = '' ) {
+	$sep = '&';
+	$ret = array();
+
+	foreach ( (array) $args as $k => $v ) {
+		$k = urlencode( $k );
+
+		if ( ! empty( $key ) ) {
+			$k = $key . '%5B' . $k . '%5D';
+		}
+
+		if ( null === $v ) {
+			continue;
+		} elseif ( false === $v ) {
+			$v = '0';
+		}
+
+		if ( is_array( $v ) || is_object( $v ) ) {
+			array_push( $ret, wpcf7_build_query( $v, $k ) );
+		} else {
+			array_push( $ret, $k . '=' . urlencode( $v ) );
+		}
+	}
+
+	return implode( $sep, $ret );
+}
+
+/**
+ * Returns the number of code units in a string.
+ *
+ * @see http://www.w3.org/TR/html5/infrastructure.html#code-unit-length
+ *
+ * @return int|bool The number of code units, or false if mb_convert_encoding is not available.
+ */
+function wpcf7_count_code_units( $string ) {
+	static $use_mb = null;
+
+	if ( is_null( $use_mb ) ) {
+		$use_mb = function_exists( 'mb_convert_encoding' );
+	}
+
+	if ( ! $use_mb ) {
+		return false;
+	}
+
+	$string = (string) $string;
+
+	$encoding = mb_detect_encoding( $string, mb_detect_order(), true );
+
+	if ( $encoding ) {
+		$string = mb_convert_encoding( $string, 'UTF-16', $encoding );
+	} else {
+		$string = mb_convert_encoding( $string, 'UTF-16', 'UTF-8' );
+	}
+
+	$byte_count = mb_strlen( $string, '8bit' );
+
+	return floor( $byte_count / 2 );
 }
 
 ?>
