@@ -659,6 +659,42 @@ $_old_files = array(
 'wp-includes/js/tinymce/plugins/paste/editor_plugin_src.js',
 'wp-includes/js/tinymce/plugins/paste/pastetext.htm',
 'wp-includes/js/tinymce/langs/wp-langs.php',
+// 4.1
+'wp-includes/js/jquery/ui/jquery.ui.accordion.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.autocomplete.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.button.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.core.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.datepicker.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.dialog.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.draggable.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.droppable.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-blind.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-bounce.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-clip.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-drop.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-explode.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-fade.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-fold.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-highlight.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-pulsate.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-scale.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-shake.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-slide.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect-transfer.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.effect.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.menu.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.mouse.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.position.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.progressbar.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.resizable.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.selectable.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.slider.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.sortable.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.spinner.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.tabs.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.tooltip.min.js',
+'wp-includes/js/jquery/ui/jquery.ui.widget.min.js',
+'wp-includes/js/tinymce/skins/wordpress/images/dashicon-no-alt.png'
 );
 
 /**
@@ -687,6 +723,7 @@ $_new_bundled_files = array(
 	'themes/twentytwelve/'   => '3.5',
 	'themes/twentythirteen/' => '3.6',
 	'themes/twentyfourteen/' => '3.8',
+	'themes/twentyfifteen/'  => '4.1',
 );
 
 /**
@@ -775,6 +812,8 @@ function update_core($from, $to) {
 
 	// Import $wp_version, $required_php_version, and $required_mysql_version from the new version
 	// $wp_filesystem->wp_content_dir() returned unslashed pre-2.8
+	global $wp_version, $required_php_version, $required_mysql_version;
+
 	$versions_file = trailingslashit( $wp_filesystem->wp_content_dir() ) . 'upgrade/version-current.php';
 	if ( ! $wp_filesystem->copy( $from . $distro . 'wp-includes/version.php', $versions_file ) ) {
 		$wp_filesystem->delete( $from, true );
@@ -787,7 +826,7 @@ function update_core($from, $to) {
 
 	$php_version    = phpversion();
 	$mysql_version  = $wpdb->db_version();
-	$old_wp_version = $GLOBALS['wp_version']; // The version of WordPress we're updating from
+	$old_wp_version = $wp_version; // The version of WordPress we're updating from
 	$development_build = ( false !== strpos( $old_wp_version . $wp_version, '-' )  ); // a dash in the version indicates a Development release
 	$php_compat     = version_compare( $php_version, $required_php_version, '>=' );
 	if ( file_exists( WP_CONTENT_DIR . '/db.php' ) && empty( $wpdb->is_mysql ) )
@@ -1089,7 +1128,10 @@ function _copy_dir($from, $to, $skip_list = array() ) {
 					return new WP_Error( 'mkdir_failed__copy_dir', __( 'Could not create directory.' ), $to . $filename );
 			}
 
-			// generate the $sub_skip_list for the subdirectory as a sub-set of the existing $skip_list
+			/*
+			 * Generate the $sub_skip_list for the subdirectory as a sub-set
+			 * of the existing $skip_list.
+			 */
 			$sub_skip_list = array();
 			foreach ( $skip_list as $skip_item ) {
 				if ( 0 === strpos( $skip_item, $filename . '/' ) )
@@ -1125,7 +1167,7 @@ function _redirect_to_about_wordpress( $new_version ) {
  	if ( 'do-core-upgrade' != $action && 'do-core-reinstall' != $action )
  		return;
 
-	// Load the updated default text localization domain for new strings
+	// Load the updated default text localization domain for new strings.
 	load_default_textdomain();
 
 	// See do_core_upgrade()
@@ -1141,7 +1183,7 @@ window.location = 'about.php?updated';
 </script>
 	<?php
 
-	// Include admin-footer.php and exit
+	// Include admin-footer.php and exit.
 	include(ABSPATH . 'wp-admin/admin-footer.php');
 	exit();
 }
