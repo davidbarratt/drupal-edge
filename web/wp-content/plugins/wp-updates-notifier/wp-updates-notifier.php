@@ -3,14 +3,16 @@
 Plugin Name: WP Updates Notifier
 Plugin URI: https://github.com/l3rady/wp-updates-notifier
 Description: Sends email to notify you if there are any updates for your WordPress site. Can notify about core, plugin and theme updates.
+Contributors: l3rady, eherman24
+Version: 1.4.3
 Author: Scott Cariss
-Version: 1.4.1
 Author URI: http://l3rady.com/
 Text Domain: wp-updates-notifier
 Domain Path: /languages
+License: GPL3+
 */
 
-/*  Copyright 2014  Scott Cariss  (email : scott@l3rady.com)
+/*  Copyright 2015  Scott Cariss  (email : scott@l3rady.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,6 +51,7 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 			add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 2 ); // Add settings link to plugin in plugin list
 			add_filter( 'sc_wpun_plugins_need_update', array( __CLASS__, 'check_plugins_against_notified' ) ); // Filter out plugins that need update if already been notified
 			add_filter( 'sc_wpun_themes_need_update', array( __CLASS__, 'check_themes_against_notified' ) ); // Filter out themes that need update if already been notified
+			add_filter( 'auto_core_update_email', array( __CLASS__, 'filter_auto_core_update_email' ), 1 ); // Filter the background update notification email.
 			// Add Actions
 			add_action( 'admin_menu', array( __CLASS__, 'admin_settings_menu' ) ); // Add menu to options
 			add_action( 'admin_init', array( __CLASS__, 'admin_settings_init' ) ); // Add admin init functions
@@ -61,7 +64,6 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 			add_action( 'wp_ajax_nopriv_sc_wpun_check', array( __CLASS__, 'sc_wpun_check' ) ); // Admin ajax hook for remote cron method.
 		}
 
-
 		/**
 		 * Check if this plugin settings are up to date. Firstly check the version in
 		 * the DB. If they don't match then load in defaults but don't override values
@@ -69,25 +71,26 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 		 *
 		 * @return void
 		 */
-		private function settingsUpToDate() {
+		private static function settingsUpToDate() {
 			$current_ver = self::getSetOptions( self::OPT_VERSION_FIELD ); // Get current plugin version
 			if ( self::OPT_VERSION != $current_ver ) { // is the version the same as this plugin?
 				$options  = (array) get_option( self::OPT_FIELD ); // get current settings from DB
 				$defaults = array( // Here are our default values for this plugin
-					'cron_method'     => 'wordpress', // Cron method to be used for scheduling scans
-					'frequency'       => 'hourly',
-					'notify_to'       => get_option( 'admin_email' ),
-					'notify_from'     => get_option( 'admin_email' ),
-					'notify_plugins'  => 1,
-					'notify_themes'   => 1,
-					'hide_updates'    => 1,
-					'notified'        => array(
+					'cron_method'      => 'wordpress', // Cron method to be used for scheduling scans
+					'frequency'        => 'hourly',
+					'notify_to'        => get_option( 'admin_email' ),
+					'notify_from'      => get_option( 'admin_email' ),
+					'notify_plugins'   => 1,
+					'notify_themes'    => 1,
+					'notify_automatic' => 1,
+					'hide_updates'     => 1,
+					'notified'         => array(
 						'core'   => "",
 						'plugin' => array(),
 						'theme'  => array(),
 					),
-					'security_key'    => sha1( microtime( true ) . mt_rand( 10000, 90000 ) ), // Generate a random key to be used for Other Cron Method,
-					'last_check_time' => false
+					'security_key'     => sha1( microtime( true ) . mt_rand( 10000, 90000 ) ), // Generate a random key to be used for Other Cron Method,
+					'last_check_time'  => false
 				);
 				// Intersect current options with defaults. Basically removing settings that are obsolete
 				$options = array_intersect_key( $options, $defaults );
@@ -419,7 +422,7 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 			add_filter( 'wp_mail_from', array( __CLASS__, 'sc_wpun_wp_mail_from' ) ); // add from filter
 			add_filter( 'wp_mail_from_name', array( __CLASS__, 'sc_wpun_wp_mail_from_name' ) ); // add from name filter
 			add_filter( 'wp_mail_content_type', array( __CLASS__, 'sc_wpun_wp_mail_content_type' ) ); // add content type filter
-			wp_mail( $settings['notify_to'], $subject, $message ); // send email
+			wp_mail( $settings['notify_to'], apply_filters( 'sc_wpun_email_subject', $subject ), apply_filters( 'sc_wpun_email_content', $message ) ); // send email
 			remove_filter( 'wp_mail_from', array( __CLASS__, 'sc_wpun_wp_mail_from' ) ); // remove from filter
 			remove_filter( 'wp_mail_from_name', array( __CLASS__, 'sc_wpun_wp_mail_from_name' ) ); // remove from name filter
 			remove_filter( 'wp_mail_content_type', array( __CLASS__, 'sc_wpun_wp_mail_content_type' ) ); // remove content type filter
@@ -445,13 +448,36 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 			self::getSetOptions( self::OPT_FIELD, $options );
 		}
 
+		/**
+		 * Filter the background update notification email
+		 *
+		 * @param array $email Array of email arguments that will be passed to wp_mail().
+		 *
+		 * @return array Modified array containing the new email address.
+		 */
+		public function filter_auto_core_update_email( $email ) {
+			$options = self::getSetOptions( self::OPT_FIELD ); // Get settings
+
+			if ( 0 != $options['notify_automatic'] ) {
+				if ( ! empty( $options['notify_to'] ) ) { // If an email address has been set, override the WordPress default.
+					$email['to'] = $options['notify_to'];
+				}
+
+				if ( ! empty( $options['notify_from'] ) ) { // If an email address has been set, override the WordPress default.
+					$email['headers'][] = 'From: ' . self::sc_wpun_wp_mail_from_name() . ' <' . $options['notify_from'] . '>';
+				}
+			}
+
+			return $email;
+		}
+
 
 		/**
 		 * Removes the update nag for non admin users.
 		 *
 		 * @return void
 		 */
-		public function remove_update_nag_for_nonadmins() {
+		public static function remove_update_nag_for_nonadmins() {
 			$settings = self::getSetOptions( self::OPT_FIELD ); // get settings
 			if ( 1 == $settings['hide_updates'] ) { // is this enabled?
 				if ( !current_user_can( 'update_plugins' ) ) { // can the current user update plugins?
@@ -516,7 +542,7 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 			wp_enqueue_script( 'wp_updates_monitor_js_function' );
 		}
 
-		public function settings_page() {
+		public static function settings_page() {
 			$options     = self::getSetOptions( self::OPT_FIELD );
 			$date_format = get_option( 'date_format' );
 			$time_format = get_option( 'time_format' );
@@ -557,15 +583,16 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 		<?php
 		}
 
-		public function admin_settings_init() {
+		public static function admin_settings_init() {
 			register_setting( self::OPT_FIELD, self::OPT_FIELD, array( __CLASS__, "sc_wpun_settings_validate" ) ); // Register Main Settings
 			add_settings_section( "sc_wpun_settings_main", __( "Settings", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_text" ), "wp-updates-notifier" ); // Make settings main section
 			add_settings_field( "sc_wpun_settings_main_cron_method", __( "Cron Method", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_field_cron_method" ), "wp-updates-notifier", "sc_wpun_settings_main" );
 			add_settings_field( "sc_wpun_settings_main_frequency", __( "Frequency to check", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_field_frequency" ), "wp-updates-notifier", "sc_wpun_settings_main" );
 			add_settings_field( "sc_wpun_settings_main_notify_to", __( "Notify email to", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_field_notify_to" ), "wp-updates-notifier", "sc_wpun_settings_main" );
-			add_settings_field( "sc_wpun_settings_main_notify_from", __( "Notify email from", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_field_notify_from" ), "wp-updates-notifier", "sc_wpun_settings_main" );
+			add_settings_field( "sc_wpun_settings_main_notify_from", __( "Notify email from", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_field_notify_from" ), "wp-updates-notifier", "sc_wpun_settings_main" );			
 			add_settings_field( "sc_wpun_settings_main_notify_plugins", __( "Notify about plugin updates?", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_field_notify_plugins" ), "wp-updates-notifier", "sc_wpun_settings_main" );
 			add_settings_field( "sc_wpun_settings_main_notify_themes", __( "Notify about theme updates?", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_field_notify_themes" ), "wp-updates-notifier", "sc_wpun_settings_main" );
+			add_settings_field( "sc_wpun_settings_main_notify_automatic", __( "Notify automatic core updates to this address?", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_field_notify_automatic" ), "wp-updates-notifier", "sc_wpun_settings_main" );
 			add_settings_field( "sc_wpun_settings_main_hide_updates", __( "Hide core WP update nag from non-admin users?", "wp-updates-notifier" ), array( __CLASS__, "sc_wpun_settings_main_field_hide_updates" ), "wp-updates-notifier", "sc_wpun_settings_main" );
 		}
 
@@ -636,6 +663,14 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 				add_settings_error( "sc_wpun_settings_main_notify_themes", "sc_wpun_settings_main_notify_themes_error", __( "Invalid theme updates value entered", "wp-updates-notifier" ), "error" );
 			}
 
+			$sanitized_notify_automatic = absint( isset( $input['notify_automatic'] ) ? $input['notify_automatic'] : 0 );
+			if ( $sanitized_notify_automatic >= 0 && $sanitized_notify_automatic <= 1 ) {
+				$valid['notify_automatic'] = $sanitized_notify_automatic;
+			}
+			else {
+				add_settings_error( "sc_wpun_settings_main_notify_automatic", "sc_wpun_settings_main_notify_automatic_error", __( "Invalid automatic updates value entered", "wp-updates-notifier" ), "error" );
+			}
+
 			$sanitized_hide_updates = absint( isset( $input['hide_updates'] ) ? $input['hide_updates'] : 0 );
 			if ( $sanitized_hide_updates <= 1 ) {
 				$valid['hide_updates'] = $sanitized_hide_updates;
@@ -648,6 +683,13 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 				add_filter( 'pre_set_transient_settings_errors', array( __CLASS__, "send_test_email" ) );
 			}
 
+			if ( isset( $input['cron_method'] ) && in_array( $input['cron_method'], array( "wordpress", "other" ) ) ) {
+				$valid['cron_method'] = $input['cron_method'];
+			}
+			else {
+				add_settings_error( "sc_wpun_settings_main_cron_method", "sc_wpun_settings_main_cron_method_error", __( "Invalid cron method selected", "wp-updates-notifier" ), "error" );
+			}
+			
 			return $valid;
 		}
 
@@ -660,7 +702,7 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 		public static function sc_wpun_settings_main_text() {
 		}
 
-		public function sc_wpun_settings_main_field_cron_method() {
+		public static function sc_wpun_settings_main_field_cron_method() {
 			$options = self::getSetOptions( self::OPT_FIELD );
 			?>
 			<select name="<?php echo self::OPT_FIELD; ?>[cron_method]">
@@ -675,7 +717,7 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 		<?php
 		}
 
-		public function sc_wpun_settings_main_field_frequency() {
+		public static function sc_wpun_settings_main_field_frequency() {
 			$options = self::getSetOptions( self::OPT_FIELD );
 			?>
 			<select id="sc_wpun_settings_main_frequency" name="<?php echo self::OPT_FIELD; ?>[frequency]">
@@ -686,20 +728,20 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 		<?php
 		}
 
-		public function sc_wpun_settings_main_field_notify_to() {
+		public static function sc_wpun_settings_main_field_notify_to() {
 			$options = self::getSetOptions( self::OPT_FIELD );
 			?>
 			<input id="sc_wpun_settings_main_notify_to" class="regular-text" name="<?php echo self::OPT_FIELD; ?>[notify_to]" value="<?php echo $options['notify_to']; ?>" />
 			<span class="description"><?php _e( "Separate multiple email address with a comma (,)", "wp-updates-notifier" ); ?></span><?php
 		}
 
-		public function sc_wpun_settings_main_field_notify_from() {
+		public static function sc_wpun_settings_main_field_notify_from() {
 			$options = self::getSetOptions( self::OPT_FIELD );
 			?>
 			<input id="sc_wpun_settings_main_notify_from" class="regular-text" name="<?php echo self::OPT_FIELD; ?>[notify_from]" value="<?php echo $options['notify_from']; ?>" /><?php
 		}
 
-		public function sc_wpun_settings_main_field_notify_plugins() {
+		public static function sc_wpun_settings_main_field_notify_plugins() {
 			$options = self::getSetOptions( self::OPT_FIELD );
 			?>
 			<label><input name="<?php echo self::OPT_FIELD; ?>[notify_plugins]" type="radio" value="0" <?php checked( $options['notify_plugins'], 0 ); ?> /> <?php _e( "No", "wp-updates-notifier" ); ?>
@@ -711,7 +753,7 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 		<?php
 		}
 
-		public function sc_wpun_settings_main_field_notify_themes() {
+		public static function sc_wpun_settings_main_field_notify_themes() {
 			$options = self::getSetOptions( self::OPT_FIELD );
 			?>
 			<label><input name="<?php echo self::OPT_FIELD; ?>[notify_themes]" type="radio" value="0" <?php checked( $options['notify_themes'], 0 ); ?> /> <?php _e( "No", "wp-updates-notifier" ); ?>
@@ -723,7 +765,15 @@ if ( !class_exists( 'sc_WPUpdatesNotifier' ) ) {
 		<?php
 		}
 
-		public function sc_wpun_settings_main_field_hide_updates() {
+		public static function sc_wpun_settings_main_field_notify_automatic() {
+			$options = self::getSetOptions( self::OPT_FIELD );
+			?>
+			<label><input name="<?php echo self::OPT_FIELD; ?>[notify_automatic]" type="checkbox" value="1" <?php checked( $options['notify_automatic'], 1 ); ?> /> <?php _e( "Yes", "wp-updates-notifier" ); ?>
+			</label>
+		<?php
+		}
+
+		public static function sc_wpun_settings_main_field_hide_updates() {
 			$options = self::getSetOptions( self::OPT_FIELD );
 			?>
 			<select id="sc_wpun_settings_main_hide_updates" name="<?php echo self::OPT_FIELD; ?>[hide_updates]">
