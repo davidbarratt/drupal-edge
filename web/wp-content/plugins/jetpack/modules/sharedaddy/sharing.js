@@ -3,10 +3,8 @@ var sharing_js_options;
 if ( sharing_js_options && sharing_js_options.counts ) {
 	var WPCOMSharing = {
 		done_urls : [],
-		twitter_count : {},
 		get_counts : function() {
-			var facebookPostIds = [],
-				https_url, http_url, url, urls, id, service, service_url, path_ending;
+			var url, requests, id, service, service_request;
 
 			if ( 'undefined' === typeof WPCOM_sharing_counts ) {
 				return;
@@ -19,17 +17,7 @@ if ( sharing_js_options && sharing_js_options.counts ) {
 					continue;
 				}
 
-				// get both the http and https version of these URLs
-				https_url = url.replace( /^http:\/\//i, 'https://' );
-				http_url  = url.replace( /^https:\/\//i, 'http://' );
-
-				urls = {
-					twitter: [
-						'https://cdn.api.twitter.com/1/urls/count.json?callback=WPCOMSharing.update_twitter_count&url=' +
-							encodeURIComponent( http_url ),
-						'https://cdn.api.twitter.com/1/urls/count.json?callback=WPCOMSharing.update_twitter_count&url=' +
-							encodeURIComponent( https_url )
-					],
+				requests = {
 					// LinkedIn actually gets the share count for both the http and https version automatically -- so we don't need to do extra magic
 					linkedin: [
 							'https://www.linkedin.com/countserv/count/share?format=jsonp&callback=WPCOMSharing.update_linkedin_count&url=' +
@@ -40,21 +28,22 @@ if ( sharing_js_options && sharing_js_options.counts ) {
 						window.location.protocol +
 							'//api.pinterest.com/v1/urls/count.json?callback=WPCOMSharing.update_pinterest_count&url=' +
 							encodeURIComponent( url )
+					],
+					// Facebook protocol summing has been shown to falsely double counts, so we only request the current URL
+					facebook: [
+						window.location.protocol +
+							'//graph.facebook.com/?callback=WPCOMSharing.update_facebook_count&ids=' +
+							encodeURIComponent( url )
 					]
 				};
 
-				if ( jQuery( 'a[data-shared=sharing-facebook-' + id  + ']' ).length ) {
-					WPCOMSharing.bump_sharing_count_stat( 'facebook' );
-					facebookPostIds.push( id );
-				}
-
-				for ( service in urls ) {
+				for ( service in requests ) {
 					if ( ! jQuery( 'a[data-shared=sharing-' + service + '-' + id  + ']' ).length ) {
 						continue;
 					}
 
-					while ( ( service_url = urls[ service ].pop() ) ) {
-						jQuery.getScript( service_url );
+					while ( ( service_request = requests[ service ].pop() ) ) {
+						jQuery.getScript( service_request );
 					}
 
 					WPCOMSharing.bump_sharing_count_stat( service );
@@ -62,74 +51,37 @@ if ( sharing_js_options && sharing_js_options.counts ) {
 
 				WPCOMSharing.done_urls[ id ] = true;
 			}
-
-			if ( facebookPostIds.length && ( 'WPCOM_site_ID' in window ) ) {
-				path_ending = window.WPCOM_jetpack ? 'jetpack-count' : 'count';
-				jQuery.ajax({
-					dataType: 'jsonp',
-					url: 'https://public-api.wordpress.com/rest/v1.1/sites/' + window.WPCOM_site_ID + '/sharing-buttons/facebook/' + path_ending,
-					jsonpCallback: 'WPCOMSharing.update_facebook_count',
-					data: { post_ID: facebookPostIds },
-					cache: true
-				});
-			}
 		},
 
 		// get the version of the url that was stored in the dom (sharing-$service-URL)
 		get_permalink: function( url ) {
-			var rxTrailingSlash, formattedSlashUrl;
-
 			if ( 'https:' === window.location.protocol ) {
 				url = url.replace( /^http:\/\//i, 'https://' );
 			} else {
 				url = url.replace( /^https:\/\//i, 'http://' );
 			}
 
-			// Some services (e.g. Twitter) canonicalize the URL with a trailing
-			// slash. We can account for this by checking whether either format
-			// exists as a known URL
-			if ( ! ( url in WPCOM_sharing_counts ) ) {
-				rxTrailingSlash = /\/$/,
-				formattedSlashUrl = rxTrailingSlash.test( url ) ?
-					url.replace( rxTrailingSlash, '' ) : url + '/';
-
-				if ( formattedSlashUrl in WPCOM_sharing_counts ) {
-					url = formattedSlashUrl;
-				}
-			}
-
 			return url;
 		},
-		update_facebook_count : function( data ) {
-			var index, length, post;
+		update_facebook_count: function( data ) {
+			var url, permalink;
 
-			if ( ! data || ! data.counts ) {
+			if ( ! data ) {
 				return;
 			}
 
-			for ( index = 0, length = data.counts.length; index < length; index++ ) {
-				post = data.counts[ index ];
-
-				if ( ! post.post_ID || ! post.count ) {
+			for ( url in data ) {
+				if ( ! data.hasOwnProperty( url ) || ! data[ url ].shares ) {
 					continue;
 				}
 
-				WPCOMSharing.inject_share_count( 'sharing-facebook-' + post.post_ID, post.count );
-			}
-		},
-		update_twitter_count : function( data ) {
-			if ( 'number' === typeof data.count ) {
-				var permalink = WPCOMSharing.get_permalink( data.url );
+				permalink = WPCOMSharing.get_permalink( url );
 
-				if ( ! WPCOMSharing.twitter_count[ permalink ] ) {
-					WPCOMSharing.twitter_count[ permalink ] = 0;
+				if ( ! ( permalink in WPCOM_sharing_counts ) ) {
+					continue;
 				}
 
-				WPCOMSharing.twitter_count[ permalink ] += data.count;
-
-				if ( WPCOMSharing.twitter_count[ permalink ] > 0 ) {
-					WPCOMSharing.inject_share_count( 'sharing-twitter-' + WPCOM_sharing_counts[ permalink ], WPCOMSharing.twitter_count[ permalink ] );
-				}
+				WPCOMSharing.inject_share_count( 'sharing-facebook-' + WPCOM_sharing_counts[ permalink ], data[ url ].shares );
 			}
 		},
 		update_linkedin_count : function( data ) {

@@ -26,12 +26,13 @@ function jetpack_top_posts_widget_init() {
 }
 
 class Jetpack_Top_Posts_Widget extends WP_Widget {
-	var $alt_option_name = 'widget_stats_topposts';
-	var $default_title = '';
+	public $alt_option_name = 'widget_stats_topposts';
+	public $default_title = '';
 
 	function __construct() {
 		parent::__construct(
 			'top-posts',
+			/** This filter is documented in modules/widgets/facebook-likebox.php */
 			apply_filters( 'jetpack_widget_name', __( 'Top Posts &amp; Pages', 'jetpack' ) ),
 			array(
 				'description' => __( 'Shows your most viewed posts and pages.', 'jetpack' ),
@@ -51,10 +52,9 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 	}
 
 	function form( $instance ) {
-		$title = isset( $instance['title' ] ) ? $instance['title'] : false;
-		if ( false === $title ) {
-			$title = $this->default_title;
-		}
+		$instance = wp_parse_args( (array) $instance, $this->defaults() );
+
+		$title = stripslashes( $instance['title'] );
 
 		$count = isset( $instance['count'] ) ? (int) $instance['count'] : 10;
 		if ( $count < 1 || 10 < $count ) {
@@ -63,6 +63,9 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 
 		$allowed_post_types = array_values( get_post_types( array( 'public' => true ) ) );
 		$types = isset( $instance['types'] ) ? (array) $instance['types'] : array( 'post', 'page' );
+
+		// 'likes' are not available in Jetpack
+		$ordering = isset( $instance['ordering'] ) && 'likes' === $instance['ordering'] ? 'likes' : 'views';
 
 		if ( isset( $instance['display'] ) && in_array( $instance['display'], array( 'grid', 'list', 'text'  ) ) ) {
 			$display = $instance['display'];
@@ -81,6 +84,16 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 			<label for="<?php echo $this->get_field_id( 'count' ); ?>"><?php esc_html_e( 'Maximum number of posts to show (no more than 10):', 'jetpack' ); ?></label>
 			<input id="<?php echo $this->get_field_id( 'count' ); ?>" name="<?php echo $this->get_field_name( 'count' ); ?>" type="number" value="<?php echo (int) $count; ?>" min="1" max="10" />
 		</p>
+
+		<?php if ( defined( 'IS_WPCOM' ) && IS_WPCOM ) : ?>
+		<p>
+			<label><?php esc_html_e( 'Order Top Posts &amp; Pages By:', 'jetpack' ); ?></label>
+			<ul>
+				<li><label><input id="<?php echo $this->get_field_id( 'ordering' ); ?>-likes" name="<?php echo $this->get_field_name( 'ordering' ); ?>" type="radio" value="likes" <?php checked( 'likes', $ordering ); ?> /> <?php esc_html_e( 'Likes', 'jetpack' ); ?></label></li>
+				<li><label><input id="<?php echo $this->get_field_id( 'ordering' ); ?>-views" name="<?php echo $this->get_field_name( 'ordering' ); ?>" type="radio" value="views" <?php checked( 'views', $ordering ); ?> /> <?php esc_html_e( 'Views', 'jetpack' ); ?></label></li>
+			</ul>
+		</p>
+		<?php endif; ?>
 
 		<p>
 			<label for="<?php echo $this->get_field_id( 'types' ); ?>"><?php esc_html_e( 'Types of pages to display:', 'jetpack' ); ?></label>
@@ -130,6 +143,9 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 			$instance['count'] = 10;
 		}
 
+		// 'likes' are not available in Jetpack
+		$instance['ordering'] = isset( $new_instance['ordering'] ) && 'likes' == $new_instance['ordering'] ? 'likes' : 'views';
+
 		$allowed_post_types = array_values( get_post_types( array( 'public' => true ) ) );
 		$instance['types'] = $new_instance['types'];
 		foreach( $new_instance['types'] as $key => $type ) {
@@ -148,6 +164,8 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 	}
 
 	function widget( $args, $instance ) {
+		$instance = wp_parse_args( (array) $instance, $this->defaults() );
+
 		$title = isset( $instance['title' ] ) ? $instance['title'] : false;
 		if ( false === $title ) {
 			$title = $this->default_title;
@@ -162,6 +180,8 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 		/**
 		 * Control the number of displayed posts.
 		 *
+		 * @module widgets
+		 *
 		 * @since 3.3.0
 		 *
 		 * @param string $count Number of Posts displayed in the Top Posts widget. Default is 10.
@@ -169,6 +189,9 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 		$count = apply_filters( 'jetpack_top_posts_widget_count', $count );
 
 		$types = isset( $instance['types'] ) ? (array) $instance['types'] : array( 'post', 'page' );
+
+		// 'likes' are not available in Jetpack
+		$ordering = isset( $instance['ordering'] ) && 'likes' == $instance['ordering'] ? 'likes' : 'views';
 
 		if ( isset( $instance['display'] ) && in_array( $instance['display'], array( 'grid', 'list', 'text'  ) ) ) {
 			$display = $instance['display'];
@@ -190,6 +213,8 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 			/**
 			 * Top Posts Widget Image options.
 			 *
+			 * @module widgets
+			 *
 			 * @since 1.8.0
 			 *
 			 * @param array $get_image_options {
@@ -202,7 +227,11 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 			$get_image_options = apply_filters( 'jetpack_top_posts_widget_image_options', $get_image_options );
 		}
 
-		$posts = $this->get_by_views( $count );
+		if ( function_exists( 'wpl_get_blogs_most_liked_posts' ) && 'likes' == $ordering ) {
+			$posts = $this->get_by_likes( $count );
+		} else {
+			$posts = $this->get_by_views( $count );
+		}
 
 		// Filter the returned posts. Remove all posts that do not match the chosen Post Types.
 		if ( isset( $types ) ) {
@@ -257,6 +286,8 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 						/**
 						 * Fires before each Top Post result, inside <li>.
 						 *
+						 * @module widgets
+						 *
 						 * @since 3.2.0
 						 *
 						 * @param string $post['post_id'] Post ID.
@@ -264,11 +295,14 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 						do_action( 'jetpack_widget_top_posts_before_post', $post['post_id'] );
 						?>
 						<a href="<?php echo esc_url( $post['permalink'] ); ?>" title="<?php echo esc_attr( wp_kses( $post['title'], array() ) ); ?>" class="bump-view" data-bump-view="tp">
-							<img src="<?php echo esc_url( $post['image'] ); ?>" alt="<?php echo esc_attr( wp_kses( $post['title'], array() ) ); ?>" data-pin-nopin="true" />
+							<?php $size = (int) $get_image_options['avatar_size']; ?>
+							<img width="<?php echo absint( $size ); ?>" height="<?php echo absint( $size ); ?>" src="<?php echo esc_url( $post['image'] ); ?>" alt="<?php echo esc_attr( wp_kses( $post['title'], array() ) ); ?>" data-pin-nopin="true" />
 						</a>
 						<?php
 						/**
 						 * Fires after each Top Post result, inside <li>.
+						 *
+						 * @module widgets
 						 *
 						 * @since 3.2.0
 						 *
@@ -290,7 +324,8 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 						do_action( 'jetpack_widget_top_posts_before_post', $post['post_id'] );
 						?>
 						<a href="<?php echo esc_url( $post['permalink'] ); ?>" title="<?php echo esc_attr( wp_kses( $post['title'], array() ) ); ?>" class="bump-view" data-bump-view="tp">
-							<img src="<?php echo esc_url( $post['image'] ); ?>" class='widgets-list-layout-blavatar' alt="<?php echo esc_attr( wp_kses( $post['title'], array() ) ); ?>" data-pin-nopin="true" />
+							<?php $size = (int) $get_image_options['avatar_size']; ?>
+							<img width="<?php echo absint( $size ); ?>" height="<?php echo absint( $size ); ?>" src="<?php echo esc_url( $post['image'] ); ?>" class='widgets-list-layout-blavatar' alt="<?php echo esc_attr( wp_kses( $post['title'], array() ) ); ?>" data-pin-nopin="true" />
 						</a>
 						<div class="widgets-list-layout-links">
 							<a href="<?php echo esc_url( $post['permalink'] ); ?>" class="bump-view" data-bump-view="tp">
@@ -332,9 +367,48 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 		echo $args['after_widget'];
 	}
 
+	public static function defaults() {
+		return array(
+			'title'    => esc_html__( 'Top Posts &amp; Pages', 'jetpack' ),
+			'count'    => absint( 10 ),
+			'types'    => array( 'post', 'page' ),
+			'ordering' => 'views',
+			'display'  => 'text',
+		);
+	}
+
+	/*
+	 * Get most liked posts
+	 *
+	 * ONLY TO BE USED IN WPCOM
+	 */
+	function get_by_likes( $count ) {
+		$post_likes = wpl_get_blogs_most_liked_posts();
+		if ( !$post_likes ) {
+			return array();
+		}
+
+		return $this->get_posts( array_keys( $post_likes ), $count );
+	}
+
 	function get_by_views( $count ) {
+		if ( defined( 'IS_WPCOM' ) && IS_WPCOM ) {
+			global $wpdb;
+
+			$post_views = wp_cache_get( "get_top_posts_$count", 'stats' );
+			if ( false === $post_views ) {
+				$post_views = array_shift( stats_get_daily_history( false, get_current_blog_id(), 'postviews', 'post_id', false, 2, '', $count * 2 + 10, true ) );
+				unset( $post_views[0] );
+				wp_cache_add( "get_top_posts_$count", $post_views, 'stats', 1200);
+			}
+
+			return $this->get_posts( array_keys( $post_views ), $count );
+		}
+
 		/**
 		 * Filter the number of days used to calculate Top Posts for the Top Posts widget.
+		 *
+		 * @module widgets
 		 *
 		 * @since 2.8.0
 		 *
@@ -424,6 +498,8 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 		/**
 		 * Filter the Top Posts and Pages.
 		 *
+		 * @module widgets
+		 *
 		 * @since 3.0.0
 		 *
 		 * @param array $posts Array of the most popular posts.
@@ -433,3 +509,33 @@ class Jetpack_Top_Posts_Widget extends WP_Widget {
 		return apply_filters( 'jetpack_widget_get_top_posts', $posts, $post_ids, $count );
 	}
 }
+
+/**
+ * Create a shortcode to display the widget anywhere.
+ *
+ * @since 3.9.2
+ */
+function jetpack_do_top_posts_widget( $instance ) {
+	// Post Types can't be entered as an array in the shortcode parameters.
+	if ( isset( $instance['types'] ) && is_array( $instance['types'] ) ) {
+		$instance['types'] = implode( ',', $instance['types'] );
+	}
+
+	$instance = shortcode_atts(
+		Jetpack_Top_Posts_Widget::defaults(),
+		$instance,
+		'jetpack_top_posts_widget'
+	);
+
+	// Add a class to allow styling
+	$args = array(
+		'before_widget' => sprintf( '<div class="%s">', 'jetpack_top_posts_widget' ),
+	);
+
+	ob_start();
+	the_widget( 'Jetpack_Top_Posts_Widget', $instance, $args );
+	$output = ob_get_clean();
+
+	return $output;
+}
+add_shortcode( 'jetpack_top_posts_widget', 'jetpack_do_top_posts_widget' );

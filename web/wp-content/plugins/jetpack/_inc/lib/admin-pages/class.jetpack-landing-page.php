@@ -123,9 +123,8 @@ class Jetpack_Landing_Page extends Jetpack_Admin_Page {
 				$module_name[] = $val['module_name'];
 			}
 		}
-		$jumpstart_module_list = implode( $module_name, ', ' );
 
-		return $jumpstart_module_list;
+		return $module_name;
 	}
 
 	function jetpack_menu_order( $menu_order ) {
@@ -202,7 +201,7 @@ class Jetpack_Landing_Page extends Jetpack_Admin_Page {
 			?>
 			<div id="message" class="jetpack-message">
 				<div class="squeezer">
-					<h4><?php echo wp_kses( $message, array( 'strong' => array(), 'a' => array( 'href' => true ), 'br' => true ) ); ?></h4>
+					<h2><?php echo wp_kses( $message, array( 'strong' => array(), 'a' => array( 'href' => true ), 'br' => true ) ); ?></h2>
 					<?php
 					/**
 					 * Fires within the displayed message when a feature configuation is updated.
@@ -253,6 +252,24 @@ class Jetpack_Landing_Page extends Jetpack_Admin_Page {
 
 	}
 
+	/*
+	 * Build an array of NUX admin stats urls.
+	 * requires the build URL args passed as an array
+	 *
+	 * @param array $nux_admin_stats
+	 * @return (array) of built stats urls
+	 */
+	function build_nux_admin_stats_urls( $nux_admin_stats ) {
+		$nux_admin_urls = array();
+
+		foreach ( $nux_admin_stats as $value) {
+			$nux_admin_urls[ $value ] = Jetpack::build_stats_url( array( 'x_jetpack-nux' => $value ) );
+		}
+
+		return $nux_admin_urls;
+
+	}
+
 	function page_admin_scripts() {
 		// Enqueue jp.js and localize it
 		wp_enqueue_script( 'jetpack-js', plugins_url( '_inc/jp.js', JETPACK__PLUGIN_FILE ),
@@ -266,13 +283,15 @@ class Jetpack_Landing_Page extends Jetpack_Admin_Page {
 				'ays_dismiss'       => __( "This will deactivate Jetpack.\nAre you sure you want to deactivate Jetpack?", 'jetpack' ),
 				'view_all_features' => __( 'View all Jetpack features', 'jetpack' ),
 				'no_modules_found'  => sprintf( __( 'Sorry, no modules were found for the search term "%s"', 'jetpack' ), '{term}' ),
-				'modules'           => array_values( Jetpack_Admin::init()->get_modules() ),
+				'modules'           => Jetpack::get_translated_modules( array_values( Jetpack_Admin::init()->get_modules() ) ),
 				'currentVersion'    => JETPACK__VERSION,
 				'ajaxurl'           => admin_url( 'admin-ajax.php' ),
 				'jumpstart_modules' => $this->jumpstart_module_tag( 'Jumpstart' ),
 				'show_jumpstart'    => $this->jetpack_show_jumpstart(),
 				'activate_nonce'    => wp_create_nonce( 'jetpack-jumpstart-nonce' ),
+				'admin_nonce'       => wp_create_nonce( 'jetpack-admin-nonce' ),
 				'jumpstart_stats_urls'  => $this->build_jumpstart_stats_urls( array( 'dismiss', 'jumpstarted', 'learnmore', 'viewed', 'manual' ) ),
+				'admin_stats_urls'  => $this->build_nux_admin_stats_urls( array( 'enabled', 'deactivated', 'learnmore' ) ),
 				'site_url_manage'   => Jetpack::build_raw_urls( get_site_url() ),
 			)
 		);

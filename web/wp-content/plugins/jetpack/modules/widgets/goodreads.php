@@ -21,6 +21,7 @@ class WPCOM_Widget_Goodreads extends WP_Widget {
 	function __construct() {
 		parent::__construct(
 			'wpcom-goodreads',
+			/** This filter is documented in modules/widgets/facebook-likebox.php */
 			apply_filters( 'jetpack_widget_name', __( 'Goodreads', 'jetpack' ) ),
 			array(
 				'classname'   => 'widget_goodreads',
@@ -48,6 +49,7 @@ class WPCOM_Widget_Goodreads extends WP_Widget {
 	}
 
 	function widget( $args, $instance ) {
+		/** This filter is documented in core/src/wp-includes/default-widgets.php */
 		$title = apply_filters( 'widget_title', $instance['title'] );
 
 		if ( empty( $instance['user_id'] ) || 'invalid' === $instance['user_id'] ) {
@@ -83,6 +85,7 @@ class WPCOM_Widget_Goodreads extends WP_Widget {
 
 		echo $args['after_widget'];
 
+		/** This action is already documented in modules/widgets/gravatar-profile.php */
 		do_action( 'jetpack_stats_extra', 'widget', 'goodreads' );
 	}
 
