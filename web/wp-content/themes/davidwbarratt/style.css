@@ -66,7 +66,7 @@ img {
 #sitetitle {
 	float: left;
 	margin-top: 20px;
-	padding: 0;	
+	padding: 0;
 }
 
 #container .menu-main-container {
@@ -125,9 +125,35 @@ img {
 	margin: 3em 0 0 0;
 }
 
-.entry-content {
+.entry-content p,
+.entry-content li,
+.entry-content h3,
+.entry-content h4,
+.entry-content h5,
+.entry-content h6 {
+  line-height: 1.8em;
+}
+
+.entry-content p,
+.entry-content li {
   font-size: 1.5em;
   line-height: 1.8em;
+}
+
+.entry-content h3 {
+	font-size: 1.9em;
+}
+
+.entry-content h4 {
+	font-size: 1.8em;
+}
+
+.entry-content h5 {
+	font-size: 1.7em;
+}
+
+.entry-content h6 {
+	font-size: 1.6em;
 }
 
 #container .post-date {
@@ -302,10 +328,26 @@ img {
 	text-align: center;
 	width: 33%;			}
 #gallery-1 img {
-	
+
 }
 #gallery-1 .gallery-caption {
 	margin-left: 0;
+}
+
+/**
+ * Page
+ */
+.page .entry-content h4 {
+	margin-bottom: 0.2em;
+}
+.page .entry-content h5 {
+ 	margin: 0;
+}
+.page .entry-content h6 {
+	margin: 0;
+}
+.page .entry-content ul {
+	margin-bottom: 2.5em;
 }
 
 /* Attachment */
@@ -329,4 +371,3 @@ img {
 	float: right;
 	margin: 2em 0 1em 1em;
 }
-		
