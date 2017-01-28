@@ -22,8 +22,13 @@ switch( $section ) {
 		$link_title = __( 'Manage Your Plugins', 'jetpack' );
 		break;
 
+	case 'plugins-setup':
+		$link = 'https://wordpress.com/plugins/setup/' . $normalized_site_url;
+		$link_title = __( 'Back to Plan Setup', 'jetpack' );
+		break;
+
 	case 'themes':
-		$link = 'https://wordpress.com/plugins/' . $normalized_site_url;
+		$link = 'https://wordpress.com/design/' . $normalized_site_url;
 		$link_title = __( 'Manage Your Themes', 'jetpack' );
 		break;
 

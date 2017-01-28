@@ -45,27 +45,27 @@ class JetpackTracking {
 		$wpcom_user_data = Jetpack::get_connected_user_data( $user_id );
 		update_user_meta( $user_id, 'jetpack_tracks_wpcom_id', $wpcom_user_data['ID'] );
 
-		self::record_user_event( 'user_linked', array() );
+		self::record_user_event( 'wpa_user_linked', array() );
 	}
 
 	/* Activated module */
 	static function track_activate_module( $module ) {
-		self::record_user_event( 'module_activated', array( 'module' => $module ) );
+		self::record_user_event( 'wpa_module_activated', array( 'module' => $module ) );
 	}
 
 	/* Deactivated module */
 	static function track_deactivate_module( $module ) {
-		self::record_user_event( 'module_deactivated', array( 'module' => $module ) );
+		self::record_user_event( 'wpa_module_deactivated', array( 'module' => $module ) );
 	}
 
-	static function record_user_event( $event_type, $data ) {
+	static function record_user_event( $event_type, $data= array() ) {
 
 		$user = wp_get_current_user();
 		$site_url = get_option( 'siteurl' );
 
-		$data['_via_ua']  = $_SERVER['HTTP_USER_AGENT'];
-		$data['_via_ip']  = $_SERVER['REMOTE_ADDR'];
-		$data['_lg']      = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+		$data['_via_ua']  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+		$data['_via_ip']  = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
+		$data['_lg']      = isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
 		$data['blog_url'] = $site_url;
 		$data['blog_id']  = Jetpack_Options::get_option( 'id' );
 

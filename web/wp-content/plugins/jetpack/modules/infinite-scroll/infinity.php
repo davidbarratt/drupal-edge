@@ -229,6 +229,14 @@ class The_Neverending_Home_Page {
 				}
 			}
 
+			// If IS is set to click, and if the site owner changed posts_per_page, let's use that
+			if (
+				'click' == $settings['type']
+				&& ( '10' !== get_option( 'posts_per_page' ) )
+			) {
+				$settings['posts_per_page'] = (int) get_option( 'posts_per_page' );
+			}
+
 			// Force display of the click handler and attendant bits when the type isn't `click`
 			if ( 'click' !== $settings['type'] ) {
 				$settings['click_handle'] = true;
@@ -247,7 +255,8 @@ class The_Neverending_Home_Page {
 			self::$settings = apply_filters( 'infinite_scroll_settings', $settings );
 		}
 
-		return (object) self::$settings;
+		/** This filter is already documented in modules/infinite-scroll/infinity.php */
+		return (object) apply_filters( 'infinite_scroll_settings', self::$settings );
 	}
 
 	/**
@@ -291,7 +300,12 @@ class The_Neverending_Home_Page {
 	 * Is this guaranteed to be the last batch of posts?
 	 */
 	static function is_last_batch() {
-		return (bool) ( count( self::wp_query()->posts ) < self::get_settings()->posts_per_page );
+		$post_type = get_post_type();
+		$entries = wp_count_posts( empty( $post_type ) ? 'post' : $post_type )->publish;
+		if ( self::wp_query()->get( 'paged' ) && self::wp_query()->get( 'paged' ) > 1 ) {
+			$entries -= self::get_settings()->posts_per_page * self::wp_query()->get( 'paged' );
+		}
+		return $entries <= self::get_settings()->posts_per_page;
 	}
 
 	/**
@@ -322,7 +336,7 @@ class The_Neverending_Home_Page {
 			return;
 
 		// Add the setting field [infinite_scroll] and place it in Settings > Reading
-		add_settings_field( self::$option_name_enabled, '<span id="infinite-scroll-options">' . __( 'To infinity and beyond', 'jetpack' ) . '</span>', array( $this, 'infinite_setting_html' ), 'reading' );
+		add_settings_field( self::$option_name_enabled, '<span id="infinite-scroll-options">' . esc_html__( 'Infinite Scroll Behavior', 'jetpack' ) . '</span>', array( $this, 'infinite_setting_html' ), 'reading' );
 		register_setting( 'reading', self::$option_name_enabled, 'esc_attr' );
 	}
 
@@ -337,7 +351,8 @@ class The_Neverending_Home_Page {
 		if ( self::get_settings()->footer_widgets || 'click' == self::get_settings()->requested_type ) {
 			echo '<label>' . $notice . '</label>';
 		} else {
-			echo '<label><input name="infinite_scroll" type="checkbox" value="1" ' . checked( 1, '' !== get_option( self::$option_name_enabled ), false ) . ' /> ' . __( 'Scroll Infinitely', 'jetpack' ) . '</br><small>' . sprintf( __( '(Shows %s posts on each load)', 'jetpack' ), number_format_i18n( self::get_settings()->posts_per_page ) ) . '</small>' . '</label>';
+			echo '<label><input name="infinite_scroll" type="checkbox" value="1" ' . checked( 1, '' !== get_option( self::$option_name_enabled ), false ) . ' /> ' . esc_html__( 'Check to load posts as you scroll. Uncheck to show clickable button to load posts', 'jetpack' ) . '</label>';
+			echo '<p class="description">' . sprintf( esc_html__( 'Shows %s posts on each load.', 'jetpack' ), number_format_i18n( self::get_settings()->posts_per_page ) ) . '</p>';
 		}
 	}
 
@@ -359,18 +374,25 @@ class The_Neverending_Home_Page {
 		if ( empty( $id ) )
 			return;
 
+		// Add our scripts.
+		wp_register_script( 'the-neverending-homepage', plugins_url( 'infinity.js', __FILE__ ), array( 'jquery' ), '4.0.0', true );
+
+		// Add our default styles.
+		wp_register_style( 'the-neverending-homepage', plugins_url( 'infinity.css', __FILE__ ), array(), '20140422' );
+
 		// Make sure there are enough posts for IS
-		if ( 'click' == self::get_settings()->type && self::is_last_batch() )
+		if ( self::is_last_batch() ) {
 			return;
+		}
 
 		// Add a class to the body.
 		add_filter( 'body_class', array( $this, 'body_class' ) );
 
 		// Add our scripts.
-		wp_enqueue_script( 'the-neverending-homepage', plugins_url( 'infinity.js', __FILE__ ), array( 'jquery' ), 20141016, true );
+		wp_enqueue_script( 'the-neverending-homepage' );
 
 		// Add our default styles.
-		wp_enqueue_style( 'the-neverending-homepage', plugins_url( 'infinity.css', __FILE__ ), array(), '20140422' );
+		wp_enqueue_style( 'the-neverending-homepage' );
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_spinner_scripts' ) );
 
@@ -725,6 +747,7 @@ class The_Neverending_Home_Page {
 				}
 			}
 		}
+
 		unset( $post_type );
 
 		// Base JS settings
@@ -745,7 +768,7 @@ class The_Neverending_Home_Page {
 			'google_analytics' => false,
 			'offset'           => self::wp_query()->get( 'paged' ),
 			'history'          => array(
-				'host'                 => preg_replace( '#^http(s)?://#i', '', untrailingslashit( get_option( 'home' ) ) ),
+				'host'                 => preg_replace( '#^http(s)?://#i', '', untrailingslashit( esc_url( get_home_url() ) ) ),
 				'path'                 => self::get_request_path(),
 				'use_trailing_slashes' => $wp_rewrite->use_trailing_slashes,
 				'parameters'           => self::get_request_parameters(),
@@ -1098,6 +1121,8 @@ class The_Neverending_Home_Page {
 	 * @return string or null
 	 */
 	function query() {
+		global $wp_customize;
+		global $wp_version;
 		if ( ! isset( $_REQUEST['page'] ) || ! current_theme_supports( 'infinite-scroll' ) )
 			die;
 
@@ -1248,7 +1273,12 @@ class The_Neverending_Home_Page {
 			$results['type'] = 'empty';
 		}
 
-		echo wp_json_encode(
+		// This should be removed when WordPress 4.8 is released.
+		if ( version_compare( $wp_version, '4.7', '<' ) && is_customize_preview() ) {
+			$wp_customize->remove_preview_signature();
+		}
+
+		wp_send_json(
 			/**
 			 * Filter the Infinite Scroll results.
 			 *
@@ -1262,7 +1292,6 @@ class The_Neverending_Home_Page {
 			 */
 			apply_filters( 'infinite_scroll_results', $results, $query_args, self::wp_query() )
 		);
-		die;
 	}
 
 	/**
@@ -1415,7 +1444,7 @@ class The_Neverending_Home_Page {
 	 */
 	private function default_footer() {
 		$credits = sprintf(
-			'<a href="http://wordpress.org/" rel="generator">%1$s</a> ',
+			'<a href="https://wordpress.org/" target="_blank" rel="generator">%1$s</a> ',
 			__( 'Proudly powered by WordPress', 'jetpack' )
 		);
 		$credits .= sprintf(
@@ -1437,7 +1466,7 @@ class The_Neverending_Home_Page {
 		<div id="infinite-footer">
 			<div class="container">
 				<div class="blog-info">
-					<a id="infinity-blog-title" href="<?php echo home_url( '/' ); ?>" rel="home">
+					<a id="infinity-blog-title" href="<?php echo home_url( '/' ); ?>" target="_blank" rel="home">
 						<?php bloginfo( 'name' ); ?>
 					</a>
 				</div>

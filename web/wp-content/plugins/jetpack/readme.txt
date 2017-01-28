@@ -1,9 +1,9 @@
 === Jetpack by WordPress.com ===
-Contributors: automattic, adamkheckler, aduth, akirk, allendav, alternatekev, andy, apeatling, azaozz, batmoo, barry, beaulebens, blobaugh, cainm, cfinke, chaselivingston, chellycat, christinepollock, csonnek, danielbachhuber, daniloercoli, designsimply, dllh, dsmart, dzver, ebinnion, eliorivero, enej, eoigal, ethitter, gcorne, georgestephanis, gibrown, hew, hugobaeta, HypertextRanch, iammattthomas, iandunn, jacobshere, jblz, jeherve, jenhooks, jenia, jkudish, jmdodd, Joen, johnjamesjacoby, jshreve, koke, kraftbj, lancewillett, lschuyler, macmanx, martinremy, matt, matveb, mattwiebe, maverick3x6, mcsf, mdawaffe, michaeldcain, michael-arestad, migueluy, mikeyarce, mjangda, mkaz, nancythanki, nickmomrik, obenland, pento, professor44, ryancowles, richardmuscat, richardmtl, roccotripaldi, samhotchkiss, sdquirk, stephdau, tmoorewp, Viper007Bond, westi, yoavf, zinigor
+Contributors: automattic, adamkheckler, aduth, akirk, allendav, alternatekev, andy, annezazu, apeatling, azaozz, batmoo, barry, beaulebens, blobaugh, cainm, cena, cfinke, chaselivingston, chellycat, csonnek, danielbachhuber, davoraltman, daniloercoli, designsimply, dllh, drawmyface, dsmart, dzver, ebinnion, eliorivero, enej, eoigal, erania-pinnera, ethitter, gcorne, georgestephanis, gibrown, goldsounds, hew, hugobaeta, hypertextranch, iammattthomas, iandunn, jacobshere, jblz, jeherve, jenhooks, jenia, jgs, jkudish, jmdodd, Joen, johnjamesjacoby, jshreve, koke, kraftbj, lamdayap, lancewillett, lschuyler, macmanx, martinremy, matt, matveb, mattwiebe, maverick3x6, mcsf, mdawaffe, michael-arestad, migueluy, mikeyarce, mkaz, nancythanki, nickmomrik, obenland, pento, professor44, rachelsquirrel, rdcoll, ryancowles, richardmuscat, richardmtl, roccotripaldi, samhotchkiss, scarstocea, sdquirk, stephdau, tmoorewp, tyxla, Viper007Bond, westi, yoavf, zinigor
 Tags: WordPress.com, jet pack, comments, contact, gallery, performance, sharing, security, shortcodes, stats, subscriptions, widgets
-Stable tag: 3.9.4
-Requires at least: 4.3
-Tested up to: 4.4
+Stable tag: 4.4.2
+Requires at least: 4.6
+Tested up to: 4.7
 
 Increase your traffic, view your stats, speed up your site, and protect yourself from hackers with Jetpack.
 
@@ -24,22 +24,22 @@ Jetpack automatically **optimizes and speeds up** images using the global WordPr
 With Jetpack comes a **centralized dashboard** on WordPress.com. Manage plugins and menus, publish posts, and view enhanced site stats for all of your sites.
 
 = A few more things that our users love =
-Jetpack includes other features that help you customize your site including Custom CSS, Contact Forms, Galleries and Carousels, Notifications and Subscriptions, Configurable Widgets, and [many more](https://jetpack.me/features).
+Jetpack includes other features that help you customize your site including Custom CSS, Contact Forms, Galleries and Carousels, Notifications and Subscriptions, Configurable Widgets, and [many more](https://jetpack.com/features).
 
 = Dedicated Support =
-We have an entire team of happiness engineers ready to help you.  Ask your questions in the support forum, or [contact us directly](https://jetpack.me/contact-support).
+We have an entire team of happiness engineers ready to help you. Ask your questions in the support forum, or [contact us directly](https://jetpack.com/contact-support).
 
 = Contributing to Jetpack =
 
-Jetpack is open-source and we actively encourage community contributions: whether it's a compliment, bug report, code, or an idea we welcome it with open arms! [Learn about contributing](https://jetpack.me/contribute) or consider [joining our beta program](https://jetpack.me/beta).
+Jetpack is open-source and we actively encourage community contributions: whether it's a compliment, bug report, code, or an idea we welcome it with open arms! [Learn about contributing](https://jetpack.com/contribute) or consider [joining our beta program](https://jetpack.com/beta).
 
 == Installation ==
 
-[Install Jetpack from our site](https://jetpack.me/install?from=wporg) by typing in your site address.
+[Install Jetpack from our site](https://jetpack.com/install?from=wporg) by typing in your site address.
 
 Alternatively install Jetpack via the plugin directory, or by uploading the files manually to your server. After activating Jetpack, connect to WordPress.com to enable the Jetpack features.
 
-If you need additional help [read our detailed instructions (including a video walkthrough)](http://jetpack.me/support/installing-jetpack/).
+If you need additional help [read our detailed instructions (including a video walkthrough)](http://jetpack.com/support/installing-jetpack/).
 
 
 == Frequently Asked Questions ==
@@ -54,7 +54,7 @@ Many of our core features (like Photon, Stats, and Protect) make use of the Word
 
 = I already have a WordPress account, but it's not working. What's going on? =
 
-A WordPress.com account is different to the one you use to log into your self-hosted WordPress. If you can log into http://wordpress.com then you already have a WordPress.com account. If you can't, you can easily create one during Jetpack's connection process.
+A WordPress.com account is different to the one you use to log into your self-hosted WordPress. If you can log into https://wordpress.com then you already have a WordPress.com account. If you can't, you can easily create one during Jetpack's connection process.
 
 = How do I view my stats? =
 
@@ -62,7 +62,7 @@ Once you've installed Jetpack your stats will be available via "Site Stats" whic
 
 = How do I contribute to Jetpack? =
 
-There are opportunities for developers at all levels to contribute. [Learn more about contributing to Jetpack](https://jetpack.me/contribute) or consider [joining our beta program](https://jetpack.me/beta).
+There are opportunities for developers at all levels to contribute. [Learn more about contributing to Jetpack](https://jetpack.com/contribute) or consider [joining our beta program](https://jetpack.com/beta).
 
 
 == Screenshots ==
@@ -75,324 +75,272 @@ There are opportunities for developers at all levels to contribute. [Learn more 
 
 == Changelog ==
 
-= 3.9.4 =
-Release date: March 10th, 2016
+= 4.5 =
 
-Bug fix: Shortcodes: Addresses an issue with embedded Vimeo content
+* Release date: January 17, 2017
+* Release post: http://wp.me/p1moTy-3Kc
 
-= 3.9.3 =
-Release date: Mar 9th, 2016
-Release post: http://wp.me/p1moTy-396
+This release introduces a brand-new module, Jetpack Ads, a brand-new VideoPress feature, and a lot of new shortcodes and widgets.
 
-Featured:
+**Exciting New Features and Improvements:**
 
-* Site Logo now supports Custom Logo - a theme tool to be introduced in WordPress 4.5.
+* Generate revenue from your site with an all-new WordAds feature, which when enabled displays high-quality ads for your visitors.
+* Today we are proud to release a fully redesigned VideoPress interface for easy uploading, management, and add-free playback of your fantastic videos now fully integrated with your Jetpack Premium or Professional plans.
+* Spice up your sidebar with new widgets that display blog stats, author info, "Follow my blog" buttons, and even an event countdown.
+* Embed your amazing 360° photos with the VR shortcode
+* Link your visitors to your Tumblr or Twitch pages using the new icons in the Social Media Icons Widget.
 
-Enhancements:
+**Enhancements**
 
-* Carousel: Made the full size image URL use a Photon URL if enabled.
-* Comments: Removed an unnecessary redirect by always connecting via HTTPS.
-* General: Added new actions that fire before automatic updates.
-* Infinite Scroll: Introduced a later filter for settings.
-* Infinite Scroll: Removed code that is now redundant due to WordPress Core.
-* Markdown: Removed deprecated markup from the output.
-* Publicize: Improved handling of featured images in posts.
-* Shortcodes: Added houzz.com support.
-* Sitemaps: Added a language attribute to the news sitemap.
-* Sitemaps: Improved the image retrieval mechanism for posts.
-* Widgets: Added new filters in the Top Posts Widget code.
-* Widgets: Cleaned up the CSS for the Subscription widget.
+* Use the beautiful Jetpack carousel feature to display single images.
+* Turn on and update Related Posts right from the Customizer.
+* Customize the output of the Related Posts headline using a new filter.
 
-Bug Fixes:
+**Performance and Security Improvements:**
 
-* Comments: No longer reloading the page on clicking the reply button.
-* Contact Forms: Fixed a fatal error on missing metadata.
-* Contact Forms: Fixed message formatting for plaintext email clients.
-* Shortcodes: Fixed dimensions of Vimeo embeds in certain cases.
-* Shortcodes: Fixed warnings and allowed shorter style Vimeo embeds.
-* Shortcodes: Removed alignment markup from feeds for YouTube embeds.
-* Sitemaps: Made URLs display properly according to the permalink structure.
-* Stats: Fixed non-XHTML-valid markup.
-* Widgets: No longer showing errors when adding new instances of the Display Post Widget.
+* Your Custom CSS will now be served in a separate stylesheet when it is more than 2,000 characters.
+* Your Stats queries are now always being made over HTTPS.
+* Holiday Snow files now load in the footer, but rest assured the snow still falls from above.
+* We have improved Jetpack's synchronization process to support more plugins and use less resources.
+* The jQuery Cycle script used by slideshow galleries is now minified, resulting in faster loading times.
 
-= 3.9.2 =
-Release date: Feb 25th, 2016
-Release post: http://wp.me/p1moTy-2Ei
+**Slightly Less Exciting Enhancements:**
 
-Maintenance and Security Release
+* The JSON API now allows updating translations and alternative theme installation methods.
+* Public Custom Post Types are now automatically available via the WordPress.com REST API.
+* We've added a token-based authentication mechanism to the REST API in order for the site to be able to receive authenticated requests from WordPress.com.
+* Use `sync` commands in Jetpack's WP CLI.
+* You can now set the value for options directly in the Contact Form shortcode.
+* Updated some verbiage around IP Whitelisting on the Protect settings screen.
+* Custom sharing buttons got some new variables.
+* RIP blip.tv — we've removed your shortcode.
+* Improved Image and Display Posts Widget settings to provide more explanation and better error messages.
+* We've added a few new Content Options to the Customizer for supported themes.
+* Improved the Facebook Widget to avoid confusion when editing width and height settings.
+* Added and improved a few shortcodes.
 
-Featured:
+**Improved Compatibility:**
 
-* Beautiful Math: fix XSS vulnerability when parsing LaTeX markup within HTML elements.
-* Contact Form: do not save private site credentials in post meta. Thanks to @visualdatasolutions.
+* If your server is misconfigured and we can't get an IP address we're going to deactivate Protect and send you a notice so you're in the loop.
+* The WPML compatibility file wasn't loading at the right time, but we've fixed that.
+* We've improved compatibility with tools like Cavalcade to avoid stuck Cron jobs.
+* Some selected WooCommerce data (order items and order item meta) are now syncing to WordPress.com.
 
-Enhancements:
+**Bug Fixes**
 
-* Contact Info: Added two hooks for adding arbitrary information to the widget.
-* Development: Added new possibilities for REST API debugging.
-* Embeds: Added Codepen embeds support.
-* Embeds: Added Sketchfab embeds support.
-* I18n: Added support for translation packages for the Finnish language.
-* Markdown: Added a filter to enable skipping processing of developer supplied patterns.
-* Related Posts: Added a filter to change heading markup.
-* Staging: Added a constant to force staging mode.
-* Staging: Added a notice to make staging mode more obvious.
-* Top Posts Widget: Added a new `[jetpack_top_posts_widget]` shortcode.
+* You'll notice numerous design improvements to the Jetpack UI.
+* Accessibility is important to us so we've made some improvements there.
+* Missing attachments in the Carousel were causing an infinite loop, but we've corrected that.
+* Eliminated a PHP Notice when running the CLI `wp jetpack` command.
+* PHP warnings in the Restaurant Menu Post type have seen their last day with us.
+* Fixed a bug that displayed the wrong connected user for up to 24 hours after they disconnected.
+* Removed a deprecated function to prevent notices when using Infinite Scroll in the Customizer.
+* Long titles in Jetpack widgets weren't looking so great, so we cleaned them up.
+* Before now you weren't able to create a child category from WordPress.com. Now you can!
+* Rogue colons were showing up in the related posts area on sites with the Twenty Fourteen and Twenty Sixteen themes.
+* Fixed a ReCaptcha error on the Email sharing button.
+* Confirmed Instagram embeds actually load when using Infinite Scroll.
+* Site Icons now display on the WordPress.com site management interface.
+* Set a default time limit of 30 seconds when sending sync requests via Cron.
+* Synchronized supported shortcodes on a site.
+* Fixed an issue where empty categories weren't showing with the Widget Visibility feature dropdown.
+* Fixed various little bugs when working with multiple widgets in the Customizer and in the Widgets admin screen.
+* Added a Translate Widget default title in case you haven't defined one.
+* The Top Posts Widget now avoids layout issues when using the Grid layout while displaying a post without an image.
 
-Bug Fixes:
+= 4.4.2 =
 
-* Custom Post Types: Nova: Fixed a JavaScript bug on adding multiple items.
-* Embeds: Allowing embeds from Instagram with a www in an URL.
-* General: Fixed untranslated module names on the Settings screen.
-* General: Improved module descriptions and fixed misleading or broken links in descriptions.
-* General: No more notices on module deprecation on older installations.
-* General: Only showing one prompt to enable Photon when uploading several new images.
-* Multisite: Fixed a problem with site lists for older WordPress installations.
-* OpenGraph: Fixed a bug to properly fallback to a WordPress Site Icon image.
-* Photon: Improve performance for images over a secure connection.
-* Photon: No longer including links from data attributes.
-* Publicize: Fixed problems for en_AU and en_CA locales with Facebook.
-* Related Posts: Fixed a notice on certain requests.
-* Site Logo: It's no longer possible to choose a non-image.
-* Widget Visibility: No longer confusing page IDs and titles in certain cases.
+* Release date: December 6, 2016
+* Release post: http://wp.me/p1moTy-3JR
 
-= 3.9.1 =
-Release date: Jan 21st, 2016
+This release improves Jetpack compatibility with WordPress 4.7.
 
-Bug Fixes:
+**Compatibility changes**
 
-* General: Addresses a namespacing issue which was causing conflicts on some hosting providers.
-* Sitemaps: Added MSM-Sitemap to the list of plugins which, if installed, will prevent Jetpack Sitemaps from being used
+* Custom CSS: Made the Custom CSS feature of Jetpack compatible with the CSS Customizer editor in WordPress 4.7.
+* Sync: improved compatibility with the wp-missed-schedule plugin.
 
-= 3.9 =
-Release date: Jan 20th, 2016
+**Bug Fixes**
 
-Featured:
+* Featured Content: made sure there is no infinite loop when removing the featured tag from the tag list.
+* Admin: made sure help tabs are not being hidden.
+* Admin: made At a Glance page work nicely when there is no backup data yet.
+* Sync: now making sure that needed classes are loaded, preventing errors.
+* Sync: cleared out unneeded scheduled jobs.
 
-* New sharing button: let users share your content using Skype.
-* New "Social Menu" theme tool that uses Genericons to display Social Links.
-* Sitemap support for better search engine indexing.
+= 4.4.1 =
 
-Enhancements:
+* Release date: November 22, 2016
+* Release post: http://wp.me/p1moTy-3JR
 
-* Contact Form: Added a new filter that allows you to change the "Required" text.
-* General: Hidden archived sites in multisite site list.
-* General: Removed several function calls that would be deprecated in WordPress 4.5.
-* Infinite Scroll: Added a new filter to check if Infinite Scroll has been triggered.
-* Likes: Added a conditional to ensure WordPress 4.5 compatibility.
-* Photon: Improved compatibility with responsive images feature added in WordPress 4.4.
-* Photon: Now enabled by default on sites using HTTPS.
-* REST API: Extended the ability to manage users from WordPress.com.
-* REST API: Increased the performance of the plugin update endpoint.
-* Responsive Videos: Centering videos when they are wrapped in a centered paragraph.
-* Sharing: Added a new filter to customize the default OpenGraph description.
-* Shortcodes: Added Wistia oEmbed support.
-* Shortcodes: Bandcamp: Added support for new attributes for tracks approved by artists.
-* Shortcodes: Improved Medium path format recognition.
-* Slideshow: Improved compatibility with older IE versions.
-* Staging: Improved staging environment detection.
-* Widgets: Added "width" option to the Facebook Page widget.
-* Widgets: Added size parameters to tags in Top Posts to avoid warnings.
-* Widgets: Introduced major performance and stability improvements to the Display Posts Widget.
-* Widgets: Refactored to remove deprecated code patterns.
+**Bug Fixes**
 
-Bug Fixes:
+* Fixed an issue where some users with slower servers would get an error on the Jetpack dashboard when `WP_DEBUG` was enabled.
+* Fixed an issue where users on a Jetpack Professional plan who were paying monthly (as opposed to annually) wouldn’t be able to enable SEO Tools.
 
-* AtD: Fixed replacing emojis with images in the text editor in Chrome.
-* AtD: Made pre tags be excluded from spell-checking.
-* CPT: Not registering Nova if it is already registered.
-* Carousel: Fixed a bug where full size images were not always served by Photon.
-* Carousel: Reverted a change that broke direct link to carousel image.
-* Contact Form: Fixed a CSV export bug with multiple choice questions.
-* Contact Form: Fixed notices when creating feedback entries without a contact form.
-* General: Fixed a scrolling bug on modal window closing.
-* Infinite Scroll: Disabled in the Customizer when previewing a non-active theme.
-* Publicize: Fixed notices appearing with bbPress or BuddyPress installed.
-* Publicize: Showing options only to users that can change them.
-* Related Posts: Fixed incorrect URLs generated for posts.
-* Responsive Videos: Fixed warnings in debug mode.
-* Shortcodes: Bandcamp: Fixed a problem with large track IDs.
-* Shortcodes: Fixed a problem with dynamic Gist embeds.
-* Stats: Fixed dashboard widget resize problem.
-* Widgets: Added a fallback to English US when a locale isn't supported by Facebook.
-* Widgets: Fixed layout for Twenty Sixteen.
+= 4.4 =
 
-= 3.8.2 =
-Release date: Dec 17th, 2015
-Release post: http://wp.me/p1moTy-26v
+* Release date: November 21, 2016
+* Release post: http://wp.me/p1moTy-3FE
 
-Jetpack 3.8.2 is here to squash a few annoying bugs.
+**Enhancements**
 
-Bug Fixes:
+* Additional unit tests have been added to improve Jetpack's development process and stability.
+* Custom post types have been added to the WP REST API output.
+* Many of the screenshots throughout the plugin have been replaced by SVGs in order to make Jetpack smaller.
+* New endpoints have been added to allow the installation of plugin and theme zip files via the API.
+* Twelve new filters to make Jetpack more extensible!  See: http://wp.me/p1moTy-3FE.
+* New widget: "Google Translate" to allow users to translate your site into their own language.
+* New widget: "My Community" where you can see who recently interacted with your site.
+* One of the biggest issues facing Jetpack users for years now has been difficulties in moving sites from one domain name to another. This update makes strides towards improving that process.
+* Photon now uses HTTPS by default. Secure all the things!
+* There are now helpful hints throughout the admin interface to make Jetpack easier to use.
+* We now allow you to embed pins, boards and profiles from Pinterest.
+* We've added a new feature: SEO Tools, available to Jetpack Professional subscribers. You can read more about our plans here: https://jetpack.com/features/
+* We've made numerous improvements to the data sync process.
 
-* Photon: Fixed a bug where some custom thumbnail image sizes weren't being sized properly.
-* Shortcodes: Fixed an incompatibility with how WordPress renders the YouTube shortcode.
-* Shortcodes: Tightened up security in the Wufoo shortcode.
-* Image Widget: Now shows the caption.
-* Fixed typos in inline docs.
-* Very minor fixes to: Carousel, Publicize, Google+, and Infinite Scroll.
+**Bug Fixes:**
 
-= 3.8.1 =
-Release date: Dec 1st, 2015
-Release post: http://wp.me/p1moTy-23V
+* Fixed link to Akismet settings.
+* Improved compatibility between Infinite Scroll and WPML.
+* Move email notification settings back with the other email settings in the Discussion Settings.
+* Various minor performance/compatibility fixes.
 
-Jetpack 3.8.1 is here and is fully compatible with WordPress 4.4.
+= 4.3.2 =
 
-Featured:
+* Release date: October 13, 2016
 
-* Photon + Responsive Images FTW.
-* Fully compatible with Twenty Sixteen.
-* More accessibility enhancements.
-* Dropped some weight by optimizing Jetpack's plugin images.
+**Enhancements**
 
-Enhancements:
+* Unsaved changes were getting lost when users were navigating away from settings so we put in a confirmation message to prevent this from happening.
+* We've stopped counting carousel views in stats by default, you can use the `jetpack_enable_carousel_stats` filter to enable counting them again.
+* Stats are now responding faster.
+* There were several improvements and repairs made to sync including additional endpoints, performance enhancements, whitelisted data, better decision making around when to sync information, and more.
+* Markdown now has a CSS class on footnotes.
 
-* Comments: filter to allow disabling comments per post type.
+**Improved Compatibility:**
 
-Bug Fixes:
+* We've improved compatibility with Kinsta by automatically turning on Staging Mode for Jetpack when in a staging environment.
 
-* Carousel: Stop page from scrolling to top when Carousel is closed.
-* Carousel: Browser compatibility fixes with older version of IE.
-* Markdown: Fixed a bug that would strip markdown when saving in "Quick Edit" mode.
-* Single Sign On: Fixed login always redirecting to the admin dashboard.
-* Subscriptions: Filter to allow per-post emails fixed for use in themes.
+**Bug Fixes:**
 
-= 3.8.0 =
-Release date: Nov 4th, 2015
-Release post: http://wp.me/p1moTy-1VN
-
-We're happy to introduce Jetpack 3.8, which has significant contributions from the Jetpack community. Read more about it here: http://wp.me/p1moTy-1VN
-
-Feature enhancements:
-
-* New Google+ Badge Widget. Display your profile, page, or community Google+ badge.
-* New twitch.tv shortcode embeds. Display a Twitch.tv stream in your posts.
-* Accessibility enhancements.
-* A handful of new filters to allow further customization of Jetpack.
-
-Other enhancements:
-
-* Carousel: Added support to retrieve image dimensions from an image url.
-* Carousel: Simpler algorithm to detect shutter speeds.
-* Contact Form: New "Checkbox with Multiple Items" field available in the Contact Form.
-* Contact Form: Allow pre-filling form fields with URL parameters.
-* Contact Form: Better styling of the emailed form responses.
-* Performance: Replaced some custom-built functions with core's native functions.
-* Related Posts: New filter to add post classes to post's container class.
-* Sharing: New filter to choose if sharing meta box should be shown.
-* Sharing: New filter to allow sharing button markup to be editable.
-* Sharing: New filter to allow you to specify a custom Facebook app ID.
-* Social Media Icons Widget: Added option for YouTube username as well as Channel ID.
-* Social Media Icons Widget: Added Google+ icon.
-* Social Media Icons Widget: New filter to allow you to add your own social media icons and links.
-* Subscriptions: Better errors to your visitors if their subscription sign-up fails.
-* Subscriptions: Removed "widget" class from Subs shortcode form.
+* Several fixes have been made to sync to repair issues with Publicize, Notifications, and Subscriptions.
+* We removed PHP warnings by checking to make sure json language files like jetpack-en_US.json are readable before we load them.
+* We found an unused option in Gravatar Hovercard settings and removed it.
+* The correct support link is now being used to make it easier for you to connect with the Jetpack team if you need us.
+* The permissions check for plugin information retrieval was fixed as well.
+* Some plugins were adding content on outbound http requests causing an infinite loop we fixed this right up.
+* We removed some warnings that were occurring when translations didn't exist by adding a fallback.
+* We've added Moroccan Arabic translations, and switched to language packs for Croatian, Spanish (Chile) and Greek.
+* Sync was running into issues so we've limited dequeue time to 1/3 of PHP's max execution time, which has unclogged the problem.
+* We're now sending full and incremental queues separately so that a failure in one doesn't block the other.
+* There was a JavaScript enqueuing error with our Sharing feature that has been repaired.
+* The Top Posts widget now includes the ability to list attachment (media) pages.
+* We weren't building CPT links correctly resulting in bad navigation, which is now fixed.
+* We removed the form legend for default Tiled Gallery settings as it doesn't relate.
+* With shortcodes we now return early from processing them if no string is passed, as they are required.
 
 
-Bug fixes:
+= 4.3.1 =
 
-* Carousel: Fixed browser back/forward button behavior.
-* Contact Form: Allow the email field to be set to empty when building form in post editor.
-* Facebook Likebox Widget: Fixed an issue where some languages were not translating.
-* Facebook Likebox Widget: Return a language when none found.
-* General: Fixed some minor styling issues in the Jetpack admin areas.
-* General: Add missing parameter to the_title filter call.
-* General: Prevent scrolling of body when the Jetpack admin modals are opened.
-* General: Update doc to reflect that Open Graph filter jetpack_enable_opengraph has been deprecated in favor of jetpack_enable_open_graph.
-* Infinite Scroll: Fixed an error that sometimes occurred that would stop posts from loading.
-* JSON API: Fixed some undefined notices when publishing a post with the API.
-* Open Graph: Fixed bug where facebook description content was sometimes being polluted by a filter.
-* Sharing: Use full SSL Pinterest url instead of protocol relative.
-* Sharing: Fixed plus signs appearing in tweets shared from iOS.
-* Shortcodes: Prefer HTTPS for video embeds to avoid mixed content warnings.
-* Subscriptions Widget: Fix HTML Validation error.
-* Theme Tools: Check oEmbeds for the presence of a video before adding the responsive videos filter.
-* Tiled Galleries: Add image alt attribute if there is a title set. This was breaking some screen reader functionality.
+* Release date: September 8, 2016
 
-= 3.7.2 =
-Release date: September 29th, 2015
+**Support Enhancements**
 
-* Bug Fix: REST API: Fixed an error when saving drafts and publishing posts
+* We're now syncing data about hosts so that we can provide better support when needed.
+* Minor update to inline docs to match version numbers.
 
-= 3.7.1 =
-Release date: September 28th, 2015
+**Bug Fixes:**
 
-* Enhancement: General: Added inline documentation for various filters and functions
-* Enhancement: General: Added custom capabilities for module management on multi-site installs
-* Enhancement: General: Cleaned up old changelog entries from readme
-* Enhancement: General: Cleaned up unused i18n textdomains
-* Enhancement: General: Updated the new settings page to look better in various translations
-* Enhancement: REST API: Added new endpoints to manage users
-* Enhancement: Sharing: Updated the Google logo
-* Bug Fix: Carousel: Page scroll no longer disappears after closing the carousel
-* Bug Fix: Contact Form: Fields are sent and displayed in the correct order
-* Bug Fix: Contact Form: No longer showing a notice on AJAX actions in feedback lists
-* Bug Fix: Contact Form: Made using more than two notification emails possible
-* Bug Fix: Contact Form: Mitigate a potential stored XSS vulnerability. Thanks to Marc-Alexandre Montpas (Sucuri)
-* Bug Fix: General: Mitigate a potential information disclosure. Thanks to Jaime Delgado Horna
-* Bug Fix: General: Fixed a locale error in the notifications popout
-* Bug Fix: General: Fixed a possible fatal error in the client area
-* Bug Fix: General: Fixed compatibility issues with certain use cases
-* Bug Fix: General: Disabled connection warnings for multisites with domain mapping
-* Bug Fix: General: Updated translations for correct link display in admin notices
-* Bug Fix: REST API: Fixed a fatal error in one of the endpoints
-* Bug Fix: Sharing: Fixed OpenGraph tags for Instagram embeds
-* Bug Fix: Sharing: Fixed compatibility issues with bbPress
-* Bug Fix: Widget Visibility: Fixed a fatal error in case of a missing tag
+* Admin Page: fix error when Admin Page resources could not be fetched with `wp_remote_get` due to unique host configurations.
+* Admin Page: fix error when Post By Email could not be enabled when the browser's dev console was enabled.
+* Admin Page: make sure all translated strings are encoded properly.
+* Admin Page: only use POST requests for updating the state of Jetpack, to avoid issues on servers not allowing PUT requests.
+* Admin Page: search icon no longer overlaps the global notices.
+* Admin Page: make sure that non-admins can also modify Spellchecking settings.
+* General: Improve random number generation for compatibility with more hosts.
+* General: Add deprecated PHP file (class.jetpack-landing-page.php) back as an empty file, to avoid generating fatal errors on sites with aggressive caching.
+* General: Ensure concatenated CSS is generated for RTL languages.
+* Security: Ensure that all options are included on the security tab.
+* Stats: fix display for sites with pretty permalinks disabled.
+* Subscriptions: ensure that no email is sent when updating a published post.
+* Sync: To improve performance, add snapTW to the list of post meta data that won't be synchronized for each post.
+* Sync: do not schedule a full sync after each import.
+* Verification Tools: in the Settings card, use appropriate link for each service.
 
-= 3.7.0 =
-Release date: September 9th, 2015
 
-Feature Enhancements:
+= 4.3 =
 
-* New admin page interface to easily configure Jetpack
-* Added staging site support for testing a connected Jetpack site
+* Release date: September 6th, 2016
 
-Additional changes:
+**Exciting Performance and UI Improvements:**
 
-* Enhancement: CLI: Added a possibility to change all options with confirmation for some of them
-* Enhancement: Gallery: Added filters to allow new gallery types to be declared
-* Enhancement: General: Added inline documentation for actions, filters, etc.
-* Enhancement: General: Changed class variable declarations keyword from var to public
-* Enhancement: General: Made the Settings page module toggle buttons more accessible
-* Enhancement: General: The admin bar now loads new notifications popout
-* Enhancement: General: Renamed some modules to avoid redundant prefixes
-* Enhancement: General: Switched to the WordPress Core's spinner image
-* Enhancement: General: Updated the bot list
-* Enhancement: Manage: Added the ability to activate a network-wide plugin on a single site from WordPress.com
-* Enhancement: Photon: Added a way to check image URLs against custom domains
-* Enhancement: Photon: Added prompts on the media upload page telling the user about Photon
-* Enhancement: Publicize: Added width and height values to OpenGraph tags for default images
-* Enhancement: Related Posts: Added a filter to allow disabling nofollow
-* Enhancement: REST API: Added new API endpoints to extend API functionality
-* Enhancement: REST API: Added new fields to existing API endpoints
-* Enhancement: Sharing: Added a possibility to opt-out of sharing for a single post
-* Enhancement: Sharing: Added bbPress support
-* Enhancement: Sharing: Added more configuration to the Likes modal
-* Enhancement: Sharing: Made the reddit button open a new tab
-* Enhancement: Sharing: Removed unused files
-* Enhancement: Shortcodes: Added auto embed option inside comments
-* Enhancement: Shortcodes: Added autohide parameter to the YouTube shortcode
-* Enhancement: Subscriptions: added an action that triggers at the end of the subscription process
-* Enhancement: VideoPress: Videos are now embedded using a new player
-* Enhancement: Widget Visibility: Added parent page logic
-* Enhancement: Widget Visibility: Added support for split terms
-* Enhancement: Widgets: Added actions to the Social Media widget
-* Enhancement: Widgets: Switched the Display Posts widget to the new API version
-* Bug Fix: General: Fixed scrolling to top after modal window closing
-* Bug Fix: Infinite Scroll: Added a check for cases when output buffering is disabled
-* Bug Fix: Infinite Scroll: Added translation to the copyright message
-* Bug Fix: Manage: Fixed automatic update synchronization on WordPress multisite network admin
-* Bug Fix: Manage: Redirects back to WordPress.com are allowed from the customizer view
-* Bug Fix: Media: Fixed duplicate images bug in the Media Extractor
-* Bug Fix: Publicize: Made it possible to remove previously set message
-* Bug Fix: Sharing: Added a thumbnail image to OpenGraph tags on pages with DailyMotion embeds
-* Bug Fix: Sharing: Fixed Twitter Cards tags escaping
-* Bug Fix: Sharing: Made OpenGraph tags for title and description use proper punctuation
-* Bug Fix: Sharing: Made sure Likes can be disabled on the front page
-* Bug Fix: Shortcodes: Fixed Facebook embeds by placing the script in the footer
-* Bug Fix: Shortcodes: Fixed PollDaddy shortcode issues over SSL connections
-* Bug Fix: Shortcodes: Made responsive video wrappers only wrap video embeds
-* Bug Fix: Shortcodes: Made SoundCloud accept percents for dimensions
-* Bug Fix: Social Links: Fixed a possible conflict with another class
-* Bug Fix: Stats: Made sure the Stats URL is always escaped properly
+* We have launched the all new React powered interface, a year in the making, designed to give you better control of your favorite Jetpack features.
+
+= 4.2.2 =
+
+* Release date: August 19th, 2016
+
+**Bug Fixes:**
+
+* We fixed the code which displays the Facebook share count to accomodate Facebook's new data structure.
+* We fixed an issue which caused PHP notices to get logged for users of the Twenty Fourteen theme.
+* We fixed an issue with the Minileven mobile theme which was preventing it from loading.
+* Improved Sync performance.
+* Increase security by sanitizing a URL used in the SSO process.
+
+= 4.2.1 =
+
+* Release date: August 17th, 2016
+
+**Bug Fixes:**
+
+* We fixed a conflict between Jetpack and W3 Total Cache.
+* We fixed some issues with Publicize and Custom Post Types.
+* Very large Multisite networks with lots of users can now be synchronized with WordPress.com.
+* We improved the synchronization process between your site and WordPress.com.
+
+= 4.2 =
+
+* Release date: August 10th, 2016
+
+**Performance Enhancements:**
+
+* We’ve improved Jetpack’s performance by making calls to the database more efficient; essentially, Jetpack is doing less on each page load, making things faster. #4281, #4316
+* We’ve ensured that every feature uses information that is up to date by completely refactoring the way information was synchronized between your site and WordPress.com.
+* We've improved the way Jetpack queries for information about features, which results in less overall queries.
+
+**Exciting Feature and UI Improvements:**
+
+* We now track your visitor views of Carousel images in stats.
+* You can now customize advanced typographic settings like ligatures in the Custom CSS editor with new support for the `font-feature-settings` property.
+* We’ve improved the experience when you don’t actually have enough posts to Infinitely Scroll.
+* Our Contact Info Widget allows you to enter a Google Maps API Key which is now required by Google if you want to display a map.
+
+**Security:**
+
+* We’re continuing our efforts to harden Jetpack security, by implementing the `hash_equals()` function to avoid timing attacks when comparing strings. We also improved security on CSVs exported from your contact form.
+
+**Slightly Less Exciting Feature Improvements:**
+
+* The Cartodb shortcode has been changed to match the new product name, Carto.
+* The YouTube shortcode now uses the content width defined by the theme when available, even if an embed size was defined in an old version of WordPress.
+* Breadcrumbs now support hierarchical post types and taxonomies.
+* We’ve added the Portfolio Post Type to the WordPress.com REST API whitelist.
+* There are a few new parameters for the Dailymotion shortcode.
+
+**Improved Compatibility:**
+
+* We now work well with WP Stagecoach staging sites, so you should not see any future impact on production sites.
+* We had some PHP notices popping up in the WooCommerce plugin wizard screen, these are gone.
+
+**Bug Fixes:**
+
+* We stopped loading compatibility stylesheets on the default theme's singular views for Infinite Scroll.
+* Debug tests forwarded through the contact form in the Jetpack Debug menu are now successfully sent to the support team.
+* We’ve removed the PHP notices you might have seen when moderating comments.
+* There are no longer PHP notices cropping up when publishing via Cron.
+* We’ve fixed the official Sharing buttons so they now line up just right.
+* The PHP warnings of Sitemaps stylesheets have been eliminated.
+* We’ve done away with the warnings that appeared when Tonesque processes a file which claims to be one filetype, but is actually another.
+* We’ve exterminated PHP notices that appeared when using Random Redirect, as well as when the author wasn't set.

@@ -12,6 +12,21 @@
 function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 	$image_url = trim( $image_url );
 
+	if ( class_exists( 'Jetpack') ) {
+		/**
+		 * Disables Photon URL processing for local development
+	 	 *
+	 	 * @module photon
+	 	 *
+	 	 * @since 4.1.0
+	 	 *
+	 	 * @param bool false Result of Jetpack::is_development_mode.
+	 	 */
+		if ( true === apply_filters( 'jetpack_photon_development_mode', Jetpack::is_development_mode() ) ) {
+			return $image_url;
+		}
+	}
+
 	/**
 	 * Allow specific image URls to avoid going through Photon.
 	 *
@@ -61,10 +76,6 @@ function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 	// Unable to parse
 	if ( ! is_array( $image_url_parts ) || empty( $image_url_parts['host'] ) || empty( $image_url_parts['path'] ) )
 		return $image_url;
-
-	if ( isset( $image_url_parts['scheme'] ) && 'https' == $image_url_parts['scheme'] ) {
-		$args['ssl'] = '1';
-	}
 
 	if ( is_array( $args ) ){
 		// Convert values that are arrays into strings
@@ -128,10 +139,10 @@ function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 	 *
 	 * @since 3.4.2
 	 *
-	 * @param string http://i{$subdomain}.wp.com Domain used by Photon. $subdomain is a random number between 0 and 2.
+	 * @param string https://i{$subdomain}.wp.com Domain used by Photon. $subdomain is a random number between 0 and 2.
 	 * @param string $image_url URL of the image to be photonized.
 	 */
-	$photon_domain = apply_filters( 'jetpack_photon_domain', "http://i{$subdomain}.wp.com", $image_url );
+	$photon_domain = apply_filters( 'jetpack_photon_domain', "https://i{$subdomain}.wp.com", $image_url );
 	$photon_domain = trailingslashit( esc_url( $photon_domain ) );
 	$photon_url  = $photon_domain . $image_host_path;
 
@@ -158,6 +169,10 @@ function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 			// You can pass a query string for complicated requests but where you still want CDN subdomain help, etc.
 			$photon_url .= '?' . $args;
 		}
+	}
+
+	if ( isset( $image_url_parts['scheme'] ) && 'https' == $image_url_parts['scheme'] ) {
+		$photon_url = add_query_arg( array( 'ssl' => 1 ), $photon_url );
 	}
 
 	return jetpack_photon_url_scheme( $photon_url, $scheme );
@@ -220,7 +235,7 @@ add_filter( 'jetpack_photon_any_extension_for_domain',   'jetpack_photon_allow_f
 
 function jetpack_photon_url_scheme( $url, $scheme ) {
 	if ( ! in_array( $scheme, array( 'http', 'https', 'network_path' ) ) ) {
-		$scheme = is_ssl() ? 'https' : 'http';
+		$scheme = 'https';
 	}
 
 	if ( 'network_path' == $scheme ) {

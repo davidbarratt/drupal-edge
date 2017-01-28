@@ -17,9 +17,9 @@ class Jetpack_Gallery_Widget extends WP_Widget {
 	public function __construct() {
 		$widget_ops 	= array(
 			'classname'   => 'widget-gallery',
-			'description' => __( 'Display a photo gallery or slideshow', 'jetpack' )
+			'description' => __( 'Display a photo gallery or slideshow', 'jetpack' ),
+			'customize_selective_refresh' => true,
 		);
-		$control_ops 	= array( 'width' => 250 );
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
@@ -27,9 +27,27 @@ class Jetpack_Gallery_Widget extends WP_Widget {
 			'gallery',
 			/** This filter is documented in modules/widgets/facebook-likebox.php */
 			apply_filters( 'jetpack_widget_name', __( 'Gallery', 'jetpack' ) ),
-			$widget_ops,
-			$control_ops
+			$widget_ops
 		);
+
+		if ( is_customize_preview() ) {
+			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts' ) );
+
+			if ( class_exists( 'Jetpack_Tiled_Gallery' ) ) {
+				$tiled_gallery = new Jetpack_Tiled_Gallery();
+				add_action( 'wp_enqueue_scripts', array( $tiled_gallery, 'default_scripts_and_styles' ) );
+			}
+
+			if ( class_exists( 'Jetpack_Slideshow_Shortcode' ) ) {
+				$slideshow = new Jetpack_Slideshow_Shortcode();
+				add_action( 'wp_enqueue_scripts', array( $slideshow, 'enqueue_scripts' ) );
+			}
+
+			if ( class_exists( 'Jetpack_Carousel' ) ) {
+				$carousel = new Jetpack_Carousel();
+				add_action( 'wp_enqueue_scripts', array( $carousel, 'enqueue_assets' ) );
+			}
+		}
 	}
 
 	/**
@@ -114,6 +132,9 @@ class Jetpack_Gallery_Widget extends WP_Widget {
 		echo "\n" . '</div>'; // .widget-gallery-$type
 
 		echo "\n" . $after_widget;
+
+		/** This action is documented in modules/widgets/gravatar-profile.php */
+		do_action( 'jetpack_stats_extra', 'widget_view', 'gallery' );
 	}
 
 	/**
@@ -233,7 +254,7 @@ class Jetpack_Gallery_Widget extends WP_Widget {
 
 		foreach ( $instance['attachments'] as $attachment ) {
 			$attachment_image_src = wp_get_attachment_image_src( $attachment->ID, 'full' );
-			$attachment_image_src = $attachment_image_src[0]; // [url, width, height]
+			$attachment_image_src = jetpack_photon_url( $attachment_image_src[0], array( 'w' => $this->_instance_width ) ); // [url, width, height]
 
 			$caption 	= wptexturize( strip_tags( $attachment->post_excerpt ) );
 

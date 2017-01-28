@@ -10,7 +10,7 @@ function jetpack_facebook_likebox_init() {
 }
 
 /**
- * Facebook Page Plugin (formely known as the Like Box)
+ * Facebook Page Plugin (formerly known as the Like Box)
  * Display a Facebook Page Plugin as a widget (replaces the old like box plugin)
  * https://developers.facebook.com/docs/plugins/page-plugin
  */
@@ -38,19 +38,29 @@ class WPCOM_Widget_Facebook_LikeBox extends WP_Widget {
 			apply_filters( 'jetpack_widget_name', __( 'Facebook Page Plugin', 'jetpack' ) ),
 			array(
 				'classname' => 'widget_facebook_likebox',
-				'description' => __( 'Use the Facebook Page Plugin to connect visitors to your Facebook Page', 'jetpack' )
+				'description' => __( 'Use the Facebook Page Plugin to connect visitors to your Facebook Page', 'jetpack' ),
+				'customize_selective_refresh' => true,
 			)
 		);
+
+		if ( is_active_widget( false, false, $this->id_base ) || is_active_widget( false, false, 'monster' ) || is_customize_preview() ) {
+			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		}
+	}
+
+	/**
+	 * Enqueue scripts.
+	 */
+	public function enqueue_scripts() {
+		wp_enqueue_script( 'jetpack-facebook-embed' );
+		wp_enqueue_style( 'jetpack_facebook_likebox', plugins_url( 'facebook-likebox/style.css', __FILE__ ) );
+		wp_style_add_data( 'jetpack_facebook_likebox', 'jetpack-inline', true );
 	}
 
 	function widget( $args, $instance ) {
-
 		extract( $args );
 
 		$like_args = $this->normalize_facebook_args( $instance['like_args'] );
-
-		wp_enqueue_style( 'jetpack_facebook_likebox', plugins_url( 'facebook-likebox/style.css', __FILE__ ) );
-		wp_style_add_data( 'jetpack_facebook_likebox', 'jetpack-inline', true );
 
 		if ( empty( $like_args['href'] ) || ! $this->is_valid_facebook_url( $like_args['href'] ) ) {
 			if ( current_user_can('edit_theme_options') ) {
@@ -69,16 +79,6 @@ class WPCOM_Widget_Facebook_LikeBox extends WP_Widget {
 		$like_args['show_faces'] = (bool) $like_args['show_faces'] ? 'true'  : 'false';
 		$like_args['stream']     = (bool) $like_args['stream']     ? 'true'  : 'false';
 		$like_args['cover']      = (bool) $like_args['cover']      ? 'false' : 'true';
-
-		$locale = $this->get_locale();
-
-		/** This filter is documented in modules/sharedaddy/sharing-sources.php */
-		$fb_app_id = apply_filters( 'jetpack_sharing_facebook_app_id', '249643311490' );
-		if ( is_numeric( $fb_app_id ) ) {
-			$fb_app_id = '&appId=' . $fb_app_id;
-		} else {
-			$fb_app_id = '';
-		}
 
 		echo $before_widget;
 
@@ -108,12 +108,12 @@ class WPCOM_Widget_Facebook_LikeBox extends WP_Widget {
 		<div class="fb-page" data-href="<?php echo esc_url( $page_url ); ?>" data-width="<?php echo intval( $like_args['width'] ); ?>"  data-height="<?php echo intval( $like_args['height'] ); ?>" data-hide-cover="<?php echo esc_attr( $like_args['cover'] ); ?>" data-show-facepile="<?php echo esc_attr( $like_args['show_faces'] ); ?>" data-show-posts="<?php echo esc_attr( $like_args['stream'] ); ?>">
 		<div class="fb-xfbml-parse-ignore"><blockquote cite="<?php echo esc_url( $page_url ); ?>"><a href="<?php echo esc_url( $page_url ); ?>"><?php echo esc_html( $title ); ?></a></blockquote></div>
 		</div>
-		<script>(function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = '//connect.facebook.net/<?php echo esc_html( $locale ); ?>/sdk.js#xfbml=1<?php echo $fb_app_id; ?>&version=v2.3'; fjs.parentNode.insertBefore(js, fjs); }(document, 'script', 'facebook-jssdk'));</script>
 		<?php
+		wp_enqueue_script( 'jetpack-facebook-embed' );
 		echo $after_widget;
 
-		/** This action is already documented in modules/widgets/gravatar-profile.php */
-		do_action( 'jetpack_stats_extra', 'widget', 'facebook-likebox' );
+		/** This action is documented in modules/widgets/gravatar-profile.php */
+		do_action( 'jetpack_stats_extra', 'widget_view', 'facebook-likebox' );
 	}
 
 	function update( $new_instance, $old_instance ) {
@@ -165,15 +165,17 @@ class WPCOM_Widget_Facebook_LikeBox extends WP_Widget {
 
 		<p>
 			<label for="<?php echo $this->get_field_id( 'width' ); ?>">
-				<?php _e( 'Width', 'jetpack' ); ?>
-				<input type="number" class="smalltext" min="1" max="999" maxlength="3" name="<?php echo $this->get_field_name( 'width' ); ?>" id="<?php echo $this->get_field_id( 'width' ); ?>" value="<?php echo esc_attr( $like_args['width'] ); ?>" style="text-align: center;" />px
+				<?php _e( 'Width in pixels', 'jetpack' ); ?>
+				<input type="number" class="smalltext" min="<?php echo esc_attr( $this->min_width ); ?>" max="<?php echo esc_attr( $this->max_width ); ?>" maxlength="3" name="<?php echo $this->get_field_name( 'width' ); ?>" id="<?php echo $this->get_field_id( 'width' ); ?>" value="<?php echo esc_attr( $like_args['width'] ); ?>" style="text-align: center;" />
+				<small><?php echo sprintf( __( 'Minimum: %s', 'jetpack' ), $this->min_width ); ?> / <?php echo sprintf( __( 'Maximum: %s', 'jetpack' ), $this->max_width ); ?></small>
 			</label>
 		</p>
 
 		<p>
 			<label for="<?php echo $this->get_field_id( 'height' ); ?>">
-				<?php _e( 'Height', 'jetpack' ); ?>
-				<input type="number" class="smalltext" min="1" max="999" maxlength="3" name="<?php echo $this->get_field_name( 'height' ); ?>" id="<?php echo $this->get_field_id( 'height' ); ?>" value="<?php echo esc_attr( $like_args['height'] ); ?>" style="text-align: center;" />px
+				<?php _e( 'Height in pixels', 'jetpack' ); ?>
+				<input type="number" class="smalltext" min="<?php echo esc_attr( $this->min_height ); ?>" max="<?php echo esc_attr( $this->max_height ); ?>" maxlength="3" name="<?php echo $this->get_field_name( 'height' ); ?>" id="<?php echo $this->get_field_id( 'height' ); ?>" value="<?php echo esc_attr( $like_args['height'] ); ?>" style="text-align: center;" />
+				<small><?php echo sprintf( __( 'Minimum: %s', 'jetpack' ), $this->min_height ); ?> / <?php echo sprintf( __( 'Maximum: %s', 'jetpack' ), $this->max_height ); ?></small>
 			</label>
 		</p>
 
@@ -262,14 +264,17 @@ class WPCOM_Widget_Facebook_LikeBox extends WP_Widget {
 	}
 
 	function is_valid_facebook_url( $url ) {
-		return ( FALSE !== strpos( $url, 'facebook.com' ) ) ? TRUE : FALSE;
+		return ( false !== strpos( $url, 'facebook.com' ) ) ? true : false;
 	}
 
 	function normalize_int_value( $value, $default = 0, $max = 0, $min = 0 ) {
 		$value = (int) $value;
 
-		if ( $max < $value || $min > $value )
-			$value = $default;
+		if ( $value > $max ) {
+			$value = $max;
+		} else if ( $value < $min ) {
+			$value = $min;
+		}
 
 		return (int) $value;
 	}
@@ -283,54 +288,20 @@ class WPCOM_Widget_Facebook_LikeBox extends WP_Widget {
 		return $value;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	function guess_locale_from_lang( $lang ) {
-		if ( 'en' == $lang || 'en_US' == $lang || !$lang ) {
-			return 'en_US';
-		}
-
-		if ( !class_exists( 'GP_Locales' ) ) {
-			if ( !defined( 'JETPACK__GLOTPRESS_LOCALES_PATH' ) || !file_exists( JETPACK__GLOTPRESS_LOCALES_PATH ) ) {
-				return false;
-			}
-
-			require JETPACK__GLOTPRESS_LOCALES_PATH;
-		}
-
-		if ( defined( 'IS_WPCOM' ) && IS_WPCOM ) {
-			// WP.com: get_locale() returns 'it'
-			$locale = GP_Locales::by_slug( $lang );
-		} else {
-			// Jetpack: get_locale() returns 'it_IT';
-			$locale = GP_Locales::by_field( 'facebook_locale', $lang );
-		}
-
-		if ( ! $locale ) {
-			return false;
-		}
-
-		if ( empty( $locale->facebook_locale ) ) {
-			if ( empty( $locale->wp_locale ) ) {
-				return false;
-			} else {
-				// Facebook SDK is smart enough to fall back to en_US if a
-				// locale isn't supported. Since supported Facebook locales
-				// can fall out of sync, we'll attempt to use the known
-				// wp_locale value and rely on said fallback.
-				return $locale->wp_locale;
-			}
-		}
-
-		return $locale->facebook_locale;
+		_deprecated_function( __METHOD__, '4.0.0', 'Jetpack::guess_locale_from_lang()' );
+		Jetpack::$instance->get_locale_from_lang( $lang );
 	}
 
+	/**
+	 * @deprecated
+	 */
 	function get_locale() {
-		$locale = $this->guess_locale_from_lang( get_locale() );
-
-		if ( ! $locale ) {
-			$locale = 'en_US';
-		}
-
-		return $locale;
+		_deprecated_function( __METHOD__, '4.0.0', 'Jetpack::get_locale()' );
+		Jetpack::$instance->get_locale();
 	}
 }
 
