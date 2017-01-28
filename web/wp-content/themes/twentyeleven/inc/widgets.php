@@ -13,18 +13,30 @@
 class Twenty_Eleven_Ephemera_Widget extends WP_Widget {
 
 	/**
-	 * Constructor
+	 * PHP5 constructor.
 	 *
-	 * @since Twenty Eleven 1.0
-	 **/
-	function Twenty_Eleven_Ephemera_Widget() {
-		$widget_ops = array( 'classname' => 'widget_twentyeleven_ephemera', 'description' => __( 'Use this widget to list your recent Aside, Status, Quote, and Link posts', 'twentyeleven' ) );
-		$this->WP_Widget( 'widget_twentyeleven_ephemera', __( 'Twenty Eleven Ephemera', 'twentyeleven' ), $widget_ops );
+	 * @since Twenty Eleven 2.2
+	 */
+	function __construct() {
+		parent::__construct( 'widget_twentyeleven_ephemera', __( 'Twenty Eleven Ephemera', 'twentyeleven' ), array(
+			'classname'   => 'widget_twentyeleven_ephemera',
+			'description' => __( 'Use this widget to list your recent Aside, Status, Quote, and Link posts', 'twentyeleven' ),
+			'customize_selective_refresh' => true,
+		) );
 		$this->alt_option_name = 'widget_twentyeleven_ephemera';
 
 		add_action( 'save_post', array( &$this, 'flush_widget_cache' ) );
 		add_action( 'deleted_post', array( &$this, 'flush_widget_cache' ) );
 		add_action( 'switch_theme', array( &$this, 'flush_widget_cache' ) );
+	}
+
+	/**
+	 * PHP4 constructor.
+	 *
+	 * @since Twenty Eleven 1.0
+	 */
+	function Twenty_Eleven_Ephemera_Widget() {
+		self::__construct();
 	}
 
 	/**
@@ -44,7 +56,7 @@ class Twenty_Eleven_Ephemera_Widget extends WP_Widget {
 		if ( ! isset( $args['widget_id'] ) )
 			$args['widget_id'] = null;
 
-		if ( isset( $cache[ $args['widget_id'] ] ) ) {
+		if ( ! is_customize_preview() && isset( $cache[ $args['widget_id'] ] ) ) {
 			echo $cache[ $args['widget_id'] ];
 			return;
 		}
@@ -120,7 +132,10 @@ class Twenty_Eleven_Ephemera_Widget extends WP_Widget {
 		endif;
 
 		$cache[ $args['widget_id'] ] = ob_get_flush();
-		wp_cache_set( 'widget_twentyeleven_ephemera', $cache, 'widget' );
+		if ( ! is_customize_preview() ) {
+			wp_cache_set( 'widget_twentyeleven_ephemera', $cache, 'widget' );
+		}
+
 	}
 
 	/**
