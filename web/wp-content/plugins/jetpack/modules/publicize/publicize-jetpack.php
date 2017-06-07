@@ -72,6 +72,7 @@ class Publicize extends Publicize_Base {
 			<div class="jetpack-wrap-container">
 				<div class="jetpack-text-container">
 					<p><?php printf(
+							/* translators: %s is the name of the blog */
 							esc_html( wptexturize( __( "To use Publicize, you'll need to link your %s account to your WordPress.com account using the link below.", 'jetpack' ) ) ),
 							'<strong>' . esc_html( $blog_name ) . '</strong>'
 						); ?></p>
@@ -158,8 +159,8 @@ class Publicize extends Publicize_Base {
 					check_admin_referer( 'keyring-request', 'kr_nonce' );
 					check_admin_referer( "keyring-request-$service_name", 'nonce' );
 
-					$verification = Jetpack::create_nonce( 'publicize' );
-					if ( is_wp_error( $verification ) ) {
+					$verification = Jetpack::generate_secrets( 'publicize' );
+					if ( ! $verification ) {
 						$url = Jetpack::admin_url( 'jetpack#/settings' );
 						wp_die( sprintf( __( "Jetpack is not connected. Please connect Jetpack by visiting <a href='%s'>Settings</a>.", 'jetpack' ), $url ) );
 
@@ -179,7 +180,7 @@ class Publicize extends Publicize_Base {
 						'blog_id'      => $wpcom_blog_id,
 						'secret_1'     => $verification['secret_1'],
 						'secret_2'     => $verification['secret_2'],
-						'eol'          => $verification['eol'],
+						'eol'          => $verification['exp'],
 					) ) );
 					wp_redirect( $redirect );
 					exit;
@@ -353,11 +354,16 @@ class Publicize extends Publicize_Base {
 		), menu_page_url( 'sharing', false ) );
 	}
 
-	function get_services( $filter ) {
-		if ( ! in_array( $filter, array( 'all', 'connected' ) ) ) {
-			$filter = 'all';
-		}
-
+	/**
+	 * Get social networks, either all available or only those that the site is connected to.
+	 *
+	 * @since 2.0
+	 *
+	 * @param string $filter Select the list of services that will be returned. Defaults to 'all', accepts 'connected'.
+	 *
+	 * @return array List of social networks.
+	 */
+	function get_services( $filter = 'all' ) {
 		$services = array(
 			'facebook'    => array(),
 			'twitter'     => array(),
@@ -377,7 +383,6 @@ class Publicize extends Publicize_Base {
 					$connected_services[ $service ] = $connections;
 				}
 			}
-
 			return $connected_services;
 		}
 	}
@@ -451,7 +456,10 @@ class Publicize extends Publicize_Base {
 	 * Save a flag locally to indicate that this post has already been Publicized via the selected
 	 * connections.
 	 */
-	function save_publicized( $post_ID, $post, $update ) {
+	function save_publicized( $post_ID, $post = null, $update = null ) {
+		if ( is_null( $post ) ) {
+			return;
+		}
 		// Only do this when a post transitions to being published
 		if ( get_post_meta( $post->ID, $this->PENDING ) && $this->post_type_is_publicizeable( $post->post_type ) ) {
 			$connected_services = Jetpack_Options::get_option( 'publicize_connections' );
@@ -463,7 +471,7 @@ class Publicize extends Publicize_Base {
 				 *
 				 * @param int The post ID
 				 */
-				do_action( 'jetpack_publicize_post', $post->ID );
+				do_action_deprecated( 'jetpack_publicize_post', $post->ID, '4.8.0', 'jetpack_published_post_flags' );
 			}
 			delete_post_meta( $post->ID, $this->PENDING );
 			update_post_meta( $post->ID, $this->POST_DONE . 'all', true );
@@ -511,7 +519,7 @@ class Publicize extends Publicize_Base {
 
 		if ( ! empty( $connection['connection_data']['meta']['facebook_page'] ) ) {
 			$found = false;
-			if ( is_array( $pages->data ) ) {
+			if ( $pages && is_array( $pages->data ) ) {
 				foreach ( $pages->data as $page ) {
 					if ( $page->id == $connection['connection_data']['meta']['facebook_page'] ) {
 						$found = true;
@@ -541,10 +549,7 @@ class Publicize extends Publicize_Base {
 			?>
 
 			<?php if ( ! empty( $me['name'] ) ) : ?>
-				<p><?php printf(
-						esc_html__( 'Publicize to my %s:', 'jetpack' ),
-						'<strong>' . esc_html__( 'Facebook Wall', 'jetpack' ) . '</strong>'
-					); ?></p>
+				<p><?php _e( 'Publicize to my <strong>Facebook Wall</strong>:', 'jetpack' ); ?></p>
 				<table id="option-profile">
 					<tbody>
 					<tr>
@@ -564,10 +569,7 @@ class Publicize extends Publicize_Base {
 
 			<?php if ( $pages ) : ?>
 
-				<p><?php printf(
-						esc_html__( 'Publicize to my %s:', 'jetpack' ),
-						'<strong>' . esc_html__( 'Facebook Page', 'jetpack' ) . '</strong>'
-					); ?></p>
+				<p><?php _e( 'Publicize to my <strong>Facebook Page</strong>:', 'jetpack' ); ?></p>
 				<table id="option-fb-fanpage">
 					<tbody>
 
@@ -698,10 +700,7 @@ class Publicize extends Publicize_Base {
 			}
 			?>
 
-			<p><?php printf(
-					esc_html__( 'Publicize to my %s:', 'jetpack' ),
-					'<strong>' . esc_html__( 'Tumblr blog', 'jetpack' ) . '</strong>'
-				); ?></p>
+			<p><?php _e( 'Publicize to my <strong>Tumblr blog</strong>:', 'jetpack' ); ?></p>
 
 			<ul id="option-tumblr-blog">
 

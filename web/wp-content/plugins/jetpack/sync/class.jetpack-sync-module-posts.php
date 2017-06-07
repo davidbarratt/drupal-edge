@@ -5,6 +5,9 @@ require_once dirname( __FILE__ ) . '/class.jetpack-sync-settings.php';
 class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 
 	private $just_published = array();
+	private $just_trashed = array();
+	private $action_handler;
+	private $import_end = false;
 
 	public function name() {
 		return 'posts';
@@ -19,22 +22,89 @@ class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 	}
 
 	public function set_defaults() {
+		$this->import_end = false;
 	}
 
 	public function init_listeners( $callable ) {
-		add_action( 'wp_insert_post', $callable, 10, 3 );
-		add_action( 'wp_insert_post', array( $this, 'send_published'), 11, 3 );
+		$this->action_handler = $callable;
+
+		// Core < 4.7 doesn't deal with nested wp_insert_post calls very well
+		global $wp_version;
+		$priority = version_compare( $wp_version, '4.7-alpha', '<' ) ? 0 : 11;
+
+		add_action( 'wp_insert_post', array( $this, 'wp_insert_post' ), $priority, 3 );
+
 		add_action( 'deleted_post', $callable, 10 );
-		add_action( 'jetpack_publicize_post', $callable );
 		add_action( 'jetpack_published_post', $callable, 10, 2 );
+		add_action( 'jetpack_trashed_post', $callable, 10, 2 );
+
 		add_action( 'transition_post_status', array( $this, 'save_published' ), 10, 3 );
 		add_filter( 'jetpack_sync_before_enqueue_wp_insert_post', array( $this, 'filter_blacklisted_post_types' ) );
 
 		// listen for meta changes
 		$this->init_listeners_for_meta_type( 'post', $callable );
 		$this->init_meta_whitelist_handler( 'post', array( $this, 'filter_meta' ) );
+
+		add_action( 'export_wp', $callable );
+		add_action( 'jetpack_sync_import_end', $callable );
+
+		// Movable type, RSS, Livejournal
+		add_action( 'import_done', array( $this, 'sync_import_done' ) );
+
+		// WordPress, Blogger, Livejournal, woo tax rate
+		add_action( 'import_end', array( $this, 'sync_import_end' ) );
 	}
 
+	public function sync_import_done( $importer ) {
+		// We already ran an send the import
+		if ( $this->import_end ) {
+			return;
+		}
+		/**
+		 * Sync Event that tells that the import is finished
+		 *
+		 * @since 5.0.0
+		 *
+		 * $param string $importer 
+		 */
+		do_action( 'jetpack_sync_import_end', $importer );
+		$this->import_end = true;
+	}
+
+	public function sync_import_end() {
+		// We already ran an send the import
+		if ( $this->import_end ) {
+			return;
+		}
+
+		$this->import_end = true;
+		$importer = 'unknown';
+		$backtrace = wp_debug_backtrace_summary(null, 0, false );
+		if ( $this->is_importer( $backtrace, 'Blogger_Importer' ) ) {
+			$importer = 'blogger';
+		}
+
+		if ( 'unknown' === $importer && $this->is_importer( $backtrace, 'WC_Tax_Rate_Importer' ) ) {
+			$importer = 'woo-tax-rate';
+		}
+
+		if ( 'unknown' === $importer && $this->is_importer( $backtrace, 'WP_Import' ) ) {
+			$importer = 'wordpress';
+		}
+
+		/** This filter is already documented in sync/class.jetpack-sync-module-posts.php */
+		do_action( 'jetpack_sync_import_end', $importer );
+	}
+	
+	private function is_importer( $backtrace, $class_name ) {
+		foreach ( $backtrace as $trace ) {
+			if ( strpos( $trace, $class_name ) !== false ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public function init_full_sync_listeners( $callable ) {
 		add_action( 'jetpack_full_sync_posts', $callable ); // also sends post meta
 	}
@@ -66,7 +136,7 @@ class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 
 		// config is a list of post IDs to sync
 		if ( is_array( $config ) ) {
-			$where_sql   .= ' AND ID IN (' . implode( ',', array_map( 'intval', $config ) ) . ')';
+			$where_sql .= ' AND ID IN (' . implode( ',', array_map( 'intval', $config ) ) . ')';
 		}
 
 		return $where_sql;
@@ -78,10 +148,13 @@ class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 
 	/**
 	 * Process content before send
+	 *
+	 * @param array $args wp_insert_post arguments
+	 *
+	 * @return array
 	 */
-
 	function expand_wp_insert_post( $args ) {
-		return array( $args[0], $this->filter_post_content_and_add_links( $args[1] ), $args[2] );
+		return array( $args[0], $this->filter_post_content_and_add_links( $args[1] ), $args[2], $args[3] );
 	}
 
 	function filter_blacklisted_post_types( $args ) {
@@ -110,6 +183,7 @@ class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 
 	function is_post_type_allowed( $post_id ) {
 		$post = get_post( $post_id );
+
 		return ! in_array( $post->post_type, Jetpack_Sync_Settings::get_setting( 'post_types_blacklist' ) );
 	}
 
@@ -138,13 +212,13 @@ class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 
 		// return non existant post 
 		$post_type = get_post_type_object( $post->post_type );
-		if ( empty( $post_type) || ! is_object( $post_type ) ) {
+		if ( empty( $post_type ) || ! is_object( $post_type ) ) {
 			$non_existant_post                    = new stdClass();
 			$non_existant_post->ID                = $post->ID;
 			$non_existant_post->post_modified     = $post->post_modified;
 			$non_existant_post->post_modified_gmt = $post->post_modified_gmt;
 			$non_existant_post->post_status       = 'jetpack_sync_non_registered_post_type';
-			
+
 			return $non_existant_post;
 		}
 		/**
@@ -179,9 +253,8 @@ class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 		}
 
 		/** This filter is already documented in core. wp-includes/post-template.php */
-		if ( Jetpack_Sync_Settings::get_setting( 'render_filtered_content' ) && $post_type->public  ) {
+		if ( Jetpack_Sync_Settings::get_setting( 'render_filtered_content' ) && $post_type->public ) {
 			global $shortcode_tags;
-			$shortcodes_and_callbacks_to_remove = array();
 			/**
 			 * Filter prevents some shortcodes from expanding.
 			 *
@@ -192,22 +265,25 @@ class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 			 *
 			 * @param array of shortcode tags to remove.
 			 */
-			$shortcodes_to_remove = apply_filters( 'jetpack_sync_do_not_expand_shortcodes', array( 'gallery', 'slideshow' ) );
+			$shortcodes_to_remove        = apply_filters( 'jetpack_sync_do_not_expand_shortcodes', array(
+				'gallery',
+				'slideshow'
+			) );
 			$removed_shortcode_callbacks = array();
 			foreach ( $shortcodes_to_remove as $shortcode ) {
-				if ( isset ( $shortcode_tags[ $shortcode ] )  ) {
-					$removed_shortcode_callbacks[ $shortcode ] =  $shortcode_tags[ $shortcode ];
+				if ( isset ( $shortcode_tags[ $shortcode ] ) ) {
+					$removed_shortcode_callbacks[ $shortcode ] = $shortcode_tags[ $shortcode ];
 				}
 			}
 
-			array_map( 'remove_shortcode' , array_keys( $removed_shortcode_callbacks ) );
+			array_map( 'remove_shortcode', array_keys( $removed_shortcode_callbacks ) );
 
-			$post->post_content_filtered   = apply_filters( 'the_content', $post->post_content );
-			$post->post_excerpt_filtered   = apply_filters( 'the_excerpt', $post->post_excerpt );
+			$post->post_content_filtered = apply_filters( 'the_content', $post->post_content );
+			$post->post_excerpt_filtered = apply_filters( 'the_excerpt', $post->post_excerpt );
 
 			foreach ( $removed_shortcode_callbacks as $shortcode => $callback ) {
-			add_shortcode( $shortcode, $callback );
-		}
+				add_shortcode( $shortcode, $callback );
+			}
 		}
 
 		$this->add_embed();
@@ -219,8 +295,8 @@ class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 			}
 		}
 
-		$post->permalink               = get_permalink( $post->ID );
-		$post->shortlink               = wp_get_shortlink( $post->ID );
+		$post->permalink = get_permalink( $post->ID );
+		$post->shortlink = wp_get_shortlink( $post->ID );
 
 		return $post;
 	}
@@ -229,46 +305,81 @@ class Jetpack_Sync_Module_Posts extends Jetpack_Sync_Module {
 		if ( 'publish' === $new_status && 'publish' !== $old_status ) {
 			$this->just_published[] = $post->ID;
 		}
+
+		if ( 'trash' === $new_status && 'trash' !== $old_status ) {
+			$this->just_trashed[] = $post->ID;
+		}
 	}
 
-	public function send_published( $post_ID, $post, $update ) {
+	public function wp_insert_post( $post_ID, $post = null , $update = null ) {
+		if ( ! is_numeric( $post_ID ) || is_null( $post ) ) {
+			return;
+		}
+
+		if ( Jetpack_Constants::get_constant( 'DOING_AUTOSAVE' ) ) {
+			$is_auto_save = true;
+		} else {
+			$is_auto_save = false;
+		}
+
+		call_user_func( $this->action_handler, $post_ID, $post, $update, $is_auto_save );
+		$this->send_published( $post_ID, $post );
+		$this->send_trashed( $post_ID, $post );
+	}
+
+	public function send_published( $post_ID, $post ) {
+		if ( ! in_array( $post_ID, $this->just_published ) ) {
+			return;
+		}
+
 		// Post revisions cause race conditions where this send_published add the action before the actual post gets synced
 		if ( wp_is_post_autosave( $post ) || wp_is_post_revision( $post ) ) {
 			return;
 		}
 
-		if ( ! empty( $this->just_published ) && in_array( $post_ID, $this->just_published ) ) {
-			$published = array_reverse( array_unique( $this->just_published ) );
-			
-			// Pre 4.7 WP does not have run though send_published for every save_published call
-			// So lets clear out any just_published that we recorded 
-			foreach ( $published as $just_published_post_ID ) {
-				if ( $post_ID !== $just_published_post_ID ) {
-					$post = get_post( $just_published_post_ID );
-				}
+		/**
+		 * Filter that is used to add to the post flags ( meta data ) when a post gets published
+		 *
+		 * @since 4.4.0
+		 *
+		 * @param mixed array post flags that are added to the post
+		 * @param mixed $post WP_POST object
+		 */
+		$flags = apply_filters( 'jetpack_published_post_flags', array(), $post );
 
-				/**
-				 * Filter that is used to add to the post flags ( meta data ) when a post gets published
-				 *
-				 * @since 4.4.0
-				 *
-				 * @param mixed array post flags that are added to the post
-				 * @param mixed $post WP_POST object
-				 */
-				$flags = apply_filters( 'jetpack_published_post_flags', array(), $post );
+		/**
+		 * Action that gets synced when a post type gets published.
+		 *
+		 * @since 4.4.0
+		 *
+		 * @param int $post_ID
+		 * @param mixed array $flags post flags that are added to the post
+		 */
+		do_action( 'jetpack_published_post', $post_ID, $flags );
 
-				/**
-				 * Action that gets synced when a post type gets published.
-				 *
-				 * @since 4.4.0
-				 *
-				 * @param int post_id
-				 * @param mixed array post flags that are added to the post
-				 */
-				do_action( 'jetpack_published_post', $just_published_post_ID, $flags );
-			}
-			$this->just_published = array();
+		$this->just_published = array_diff( $this->just_published, array( $post_ID ) );
+	}
+
+	public function send_trashed( $post_ID, $post ) {
+		if ( ! in_array( $post_ID, $this->just_trashed ) ) {
+			return;
 		}
+
+		// Post revisions cause race conditions where this send_published add the action before the actual post gets synced
+		if ( wp_is_post_autosave( $post ) || wp_is_post_revision( $post ) ) {
+			return;
+		}
+
+		/**
+		 * Action that gets synced when a post type gets trashed.
+		 *
+		 * @since 4.9.0
+		 *
+		 * @param int $post_ID
+		 */
+		do_action( 'jetpack_trashed_post', $post_ID );
+
+		$this->just_trashed = array_diff( $this->just_trashed, array( $post_ID ) );
 	}
 
 	public function expand_post_ids( $args ) {
