@@ -39,6 +39,33 @@ if (isset($_SERVER['WP_SITEURL'])) {
   define('WP_SITEURL', $_SERVER['WP_SITEURL']);
 }
 
+define('WPMS_ON', true);
+define('WPMS_MAILER', 'smtp');
+
+if (isset($_SERVER['SMTP_HOST'])) {
+  define('WPMS_SMTP_HOST', $_SERVER['SMTP_HOST']);
+}
+
+if (isset($_SERVER['SMTP_PORT'])) {
+  define('WPMS_SMTP_PORT', $_SERVER['SMTP_PORT']);
+}
+
+if (isset($_SERVER['SMTP_ENCRYPTION'])) {
+  define('WPMS_SSL', $_SERVER['SMTP_ENCRYPTION']);
+}
+
+if (!empty($_SERVER['SMTP_USERNAME']) && !empty($_SERVER['SMTP_PASSWORD'])) {
+  define('WPMS_SMTP_AUTH', true);
+}
+
+if (isset($_SERVER['SMTP_USERNAME'])) {
+  define('WPMS_SMTP_USER', $_SERVER['SMTP_USERNAME']);
+}
+
+if (isset($_SERVER['SMTP_PASSWORD'])) {
+  define('WPMS_SMTP_PASS', $_SERVER['SMTP_PASSWORD']);
+}
+
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
 define('DB_NAME', isset($_SERVER['MYSQL_DATABASE']) ? $_SERVER['MYSQL_DATABASE'] : '');

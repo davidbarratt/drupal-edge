@@ -284,7 +284,7 @@ function cache_control_nocacheables() {
     // Requires post password, and post has been unlocked.
     if ( !$noncacheable                             &&
          isset($wp_query)                           &&
-         isset($wp_query->posts)                    && 
+         isset($wp_query->posts)                    &&
          count($wp_query->posts) >= 1               &&
          !empty($wp_query->posts[0]->post_password) &&
          !post_password_required() ) {
@@ -397,4 +397,3 @@ add_filter( 'wp_redirect_status', 'cache_control_handle_redirects', 10, 2 );
 
 if ( is_admin() )
     require_once( dirname(__file__) . '/admin.php' );
-
