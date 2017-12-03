@@ -1,0 +1,14 @@
+version: '3'
+services:
+  web:
+    image: davidbarratt/wordpress
+    env_file:
+      - .env
+    volumes:
+      - ./html:/var/www/html:cached
+  cache:
+    image: davidbarratt/varnish
+    environment:
+      - VIRTUAL_HOST=davidwbarratt.com,origin.davidwbarratt.com,www.davidwbarratt.com
+    links:
+      - "web:backend"

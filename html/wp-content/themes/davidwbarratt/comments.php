@@ -8,8 +8,8 @@
 
 	<?php
 $fields =  array(
-	'author' => '<p><input id="author" name="author" type="text" value="Name*" data-value="Name*" size="30"' . $aria_req . ' /></p>',
-	'email'  => '<p><input id="email" name="email" type="text" value="Email*" data-value="Email*"  size="30"' . $aria_req . ' /></p>',
+	'author' => '<p><input id="author" name="author" type="text" value="Name*" data-value="Name*" size="30" /></p>',
+	'email'  => '<p><input id="email" name="email" type="text" value="Email*" data-value="Email*"  size="30" /></p>',
 	'url'    => '<p><input id="url" name="url" type="text" value="Website" data-value="Website" size="30" /></p>'
 ); ?>
 

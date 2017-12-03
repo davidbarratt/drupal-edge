@@ -19,8 +19,7 @@ register_nav_menus( array(
 ) );
 
 // Create the Custom Background
-add_custom_background();
-
+add_theme_support('custom-background');
 
 // Create the Custom Header
 define( 'HEADER_TEXTCOLOR', '' );
@@ -28,7 +27,10 @@ define( 'HEADER_IMAGE', '%s/img/header.png' );
 define( 'HEADER_IMAGE_WIDTH', 304);
 define( 'HEADER_IMAGE_HEIGHT', 36);
 define( 'NO_HEADER_TEXT', true );
-add_custom_image_header('','davidwbarratt_admin_header_style');
+add_theme_support('custom-header', [
+	'wp-head-callback' => '',
+	'admin-head-callback' => 'davidwbarratt_admin_header_style'
+]);
 
 // Required Header Style
 function davidwbarratt_admin_header_style() {
