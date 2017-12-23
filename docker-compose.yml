@@ -5,7 +5,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./html:/var/www/html:cached
+      - ./web:/var/www/html:cached
   cache:
     image: davidbarratt/varnish
     environment:
