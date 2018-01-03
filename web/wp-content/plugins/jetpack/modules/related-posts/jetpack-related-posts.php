@@ -772,9 +772,9 @@ EOT;
 		 */
 		$args['exclude_post_ids'] = apply_filters( 'jetpack_relatedposts_filter_exclude_post_ids', $args['exclude_post_ids'], $post_id );
 		if ( !empty( $args['exclude_post_ids'] ) && is_array( $args['exclude_post_ids'] ) ) {
+			$excluded_post_ids = array();
 			foreach ( $args['exclude_post_ids'] as $exclude_post_id) {
 				$exclude_post_id = (int)$exclude_post_id;
-				$excluded_post_ids = array();
 				if ( $exclude_post_id > 0 )
 					$excluded_post_ids[] = $exclude_post_id;
 			}
@@ -1449,7 +1449,15 @@ EOT;
 	protected function _enqueue_assets( $script, $style ) {
 		$dependencies = is_customize_preview() ? array( 'customize-base' ) : array( 'jquery' );
 		if ( $script ) {
-			wp_enqueue_script( 'jetpack_related-posts', plugins_url( 'related-posts.js', __FILE__ ), $dependencies, self::VERSION );
+			wp_enqueue_script(
+				'jetpack_related-posts',
+				Jetpack::get_file_url_for_environment(
+					'_inc/build/related-posts/related-posts.min.js',
+					'modules/related-posts/related-posts.js'
+				),
+				$dependencies,
+				self::VERSION
+			);
 			$related_posts_js_options = array(
 				/**
 				 * Filter each Related Post Heading structure.
