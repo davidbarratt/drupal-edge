@@ -1,0 +1,15 @@
+version: '3'
+services:
+  web:
+    restart: always
+    networks:
+      - default
+      - ingress
+    environment:
+      - VIRTUAL_HOST=davidwbarratt.com,origin.davidwbarratt.com,www.davidwbarratt.com
+  cron:
+    restart: always
+networks:
+  ingress:
+    external:
+      name: ingress

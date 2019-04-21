@@ -1,0 +1,19 @@
+uuid: 573331c4-5aff-4e64-89ca-df647f14a2b7
+langcode: en
+status: true
+dependencies: {  }
+id: my_wordpress
+label: 'Imports from WordPress site'
+description: null
+source_type: WordPress
+module: null
+shared_configuration:
+  source:
+    namespaces:
+      wp: 'http://wordpress.org/export/1.2/'
+      excerpt: 'http://wordpress.org/export/1.2/excerpt/'
+      content: 'http://purl.org/rss/1.0/modules/content/'
+      wfw: 'http://wellformedweb.org/CommentAPI/'
+      dc: 'http://purl.org/dc/elements/1.1/'
+    urls:
+      - 'public://davidwbarratt.WordPress.2019-03-13.xml'
