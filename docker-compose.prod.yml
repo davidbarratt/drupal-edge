@@ -6,7 +6,8 @@ services:
       - default
       - ingress
     environment:
-      - VIRTUAL_HOST=davidwbarratt.com,origin.davidwbarratt.com,www.davidwbarratt.com
+      VIRTUAL_HOST: davidwbarratt.com,origin.davidwbarratt.com,www.davidwbarratt.com
+      LETSENCRYPT_HOST: davidwbarratt.com,origin.davidwbarratt.com,www.davidwbarratt.com
   cron:
     restart: always
 networks:
