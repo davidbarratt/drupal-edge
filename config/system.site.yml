@@ -1,0 +1,15 @@
+uuid: da699117-cf7c-4e06-b82d-86a918e13953
+name: 'david w barratt'
+mail: david@davidwbarratt.com
+slogan: ''
+page:
+  403: ''
+  404: ''
+  front: /node
+admin_compact_mode: false
+weight_select_max: 100
+langcode: en
+default_langcode: en
+_core:
+  default_config_hash: yXadRE77Va-G6dxhd2kPYapAvbnSvTF6hO4oXiOEynI
+mail_notification: ''

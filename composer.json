@@ -1,0 +1,45 @@
+{
+  "name": "davidbarratt/davidwbarratt",
+  "description": "David W Barratt",
+  "type": "project",
+  "license": "AGPL-3.0",
+  "require": {
+    "composer/installers": "^1.0.20",
+    "drupal/core": "~8.0",
+    "drupal/stage_file_proxy": "^1.0@alpha",
+    "drupal/imagemagick": "^2.2.0",
+    "drush/drush": "~8.0",
+    "drupal/console": "^1.2.0",
+    "drupal/swiftmailer": "^1.0",
+    "drupal/wordpress_migrate": "^3.0@alpha",
+    "drupal/ctools": "^3.2",
+    "drupal/migrate_tools": "^4.1"
+  },
+  "replace": {
+    "drupal/drupal": "~8.0"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  ],
+  "config": {
+    "preferred-install": "dist",
+    "autoloader-suffix": "Drupal8",
+    "optimize-autoloader": true
+  },
+  "extra": {
+    "installer-paths": {
+      "html/core": ["type:drupal-core"],
+      "html/modules/contrib/{$name}": ["type:drupal-module"],
+      "html/themes/contrib/{$name}": ["type:drupal-theme"],
+      "html/profiles/contrib/{$name}": ["type:drupal-profile"]
+    }
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^3.4"
+  }
+}

@@ -1,0 +1,130 @@
+uuid: 8cd96efe-1975-41ad-8cb1-4fa7902f8150
+langcode: en
+status: true
+dependencies: {  }
+id: my_wordpress_comment_post
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - WordPress
+migration_group: my_wordpress
+label: 'Import comments from WordPress XML'
+source:
+  plugin: url
+  data_fetcher_plugin: http
+  data_parser_plugin: xml
+  item_selector: '/rss/channel/item/wp:comment'
+  fields:
+    -
+      name: comment_id
+      label: 'Unique comment ID'
+      selector: 'wp:comment_id'
+    -
+      name: comment_author
+      label: 'Username of comment author, if logged in.'
+      selector: 'wp:comment_author'
+    -
+      name: comment_author_email
+      label: 'Email of comment author.'
+      selector: 'wp:comment_author_email'
+    -
+      name: comment_author_url
+      label: 'Website of comment author.'
+      selector: 'wp:comment_author_url'
+    -
+      name: comment_author_IP
+      label: 'IP address of comment author.'
+      selector: 'wp:comment_author_IP'
+    -
+      name: comment_date
+      label: 'Datetime of comment (local time).'
+      selector: 'wp:comment_date'
+    -
+      name: comment_date_gmt
+      label: 'Datetime of comment (GMT).'
+      selector: 'wp:comment_date_gmt'
+    -
+      name: comment_content
+      label: 'Body of the content'
+      selector: 'wp:comment_content'
+    -
+      name: comment_approved
+      label: 'Whether the comment has been approved (published).'
+      selector: 'wp:comment_approved'
+    -
+      name: comment_type
+      label: 'The comment type.'
+      selector: 'wp:comment_type'
+    -
+      name: comment_parent
+      label: 'comment_id of the comment''s parent.'
+      selector: 'wp:comment_parent'
+    -
+      name: post_id
+      label: 'post_id of the parent content item.'
+      selector: '..\wp:post_id'
+  ids:
+    comment_id:
+      type: integer
+process:
+  entity_id:
+    -
+      plugin: migration
+      source: post_id
+      migration: my_wordpress_content_post
+  pid:
+    -
+      plugin: migration
+      source: comment_parent
+      migration: my_wordpress_comment_post
+  entity_type:
+    -
+      plugin: default_value
+      default_value: node
+  comment_type:
+    -
+      plugin: default_value
+      default_value: comment
+  field_name:
+    -
+      plugin: default_value
+      default_value: comment
+  name:
+    -
+      plugin: get
+      source: comment_author
+  mail:
+    -
+      plugin: get
+      source: comment_author_email
+  homepage:
+    -
+      plugin: get
+      source: comment_author_url
+  hostname:
+    -
+      plugin: get
+      source: comment_author_IP
+  comment_body:
+    -
+      plugin: get
+      source: comment_content
+  created:
+    -
+      plugin: callback
+      source: comment_date
+      callable: strtotime
+  changed:
+    -
+      plugin: get
+      source: '@created'
+  status:
+    -
+      plugin: get
+      source: comment_approved
+destination:
+  plugin: 'entity:comment'
+migration_dependencies:
+  required:
+    - my_wordpress_content_post
