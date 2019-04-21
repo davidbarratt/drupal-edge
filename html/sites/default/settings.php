@@ -282,7 +282,7 @@ $config_directories = [
  *   $settings['hash_salt'] = file_get_contents('/home/example/salt.txt');
  * @endcode
  */
-$settings['hash_salt'] = 'oy7YkDNnQ2kzXvcLDzlnRoZOMXfsk_yTL_B_wjRzeZkj_kr9ilsw5Z0VxqDtjrUVxWIivjhsBQ';
+$settings['hash_salt'] = $_SERVER['HASH_STALT'] ?? '';
 
 /**
  * Deployment identifier.
@@ -643,6 +643,27 @@ if ($settings['hash_salt']) {
 # $config['system.site']['name'] = 'My Drupal site';
 # $config['system.theme']['default'] = 'stark';
 # $config['user.settings']['anonymous'] = 'Visitor';
+if ($_SERVER['APP_DEBUG'] ?? false) {
+  $config['system.logging']['error_level'] = 'verbose';
+  $config['system.performance']['cache']['page']['max_age'] = 0;
+  $config['system.performance']['css']['preprocess'] = false;
+  $config['system.performance']['js']['preprocess'] = false;
+}
+
+$swiftmailer = [
+  'smtp_host',
+  'smtp_port',
+  'smtp_encryption',
+];
+foreach ($swiftmailer as $key) {
+  if (isset($_SERVER[strtoupper($key)])) {
+    $config['swiftmailer.transport'][$key] = $_SERVER[strtoupper($key)];
+  }
+}
+
+$config['swiftmailer.transport']['smtp_credentials']['swiftmailer']['username'] = $_SERVER['SMTP_USERNAME'];
+$config['swiftmailer.transport']['smtp_credentials']['swiftmailer']['password'] = $_SERVER['SMTP_PASSWORD'];
+
 
 /**
  * Fast 404 pages:
