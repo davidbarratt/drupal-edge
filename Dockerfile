@@ -6,6 +6,7 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN apt-get update && apt-get install -y \
 		  unzip \
 			git \
+			sqlite3 \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 COPY --from=composer:1.7 /usr/bin/composer /usr/bin/composer
