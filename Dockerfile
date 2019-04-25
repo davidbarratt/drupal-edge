@@ -1,19 +1,5 @@
 FROM davidbarratt/drupal:8
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
-
-# Dependencies
-RUN apt-get update && apt-get install -y \
-		  unzip \
-			git \
-			sqlite3 \
-    --no-install-recommends && rm -r /var/lib/apt/lists/*
-
-COPY --from=composer:1.7 /usr/bin/composer /usr/bin/composer
-
-# Remove the default Drupal site.
-RUN rm -rf /var/www/html
-
 COPY ./ /var/www
 
 RUN composer --no-dev install -d /var/www
