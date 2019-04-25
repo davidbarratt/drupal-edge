@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=composer:1.7 /usr/bin/composer /usr/bin/composer
 
+# Remove the default Drupal site.
+RUN rm -rf /var/www/html
+
 COPY ./ /var/www
 
 RUN composer --no-dev install -d /var/www
