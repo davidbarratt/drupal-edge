@@ -5,7 +5,7 @@
   "license": "AGPL-3.0",
   "require": {
     "composer/installers": "^1.0.20",
-    "drupal/core": "~8.0",
+    "drupal/core": "^8.7.0",
     "drupal/stage_file_proxy": "^1.0@alpha",
     "drupal/imagemagick": "^2.2.0",
     "drush/drush": "~8.0",
