@@ -364,10 +364,11 @@ $settings['reverse_proxy'] = TRUE;
  * Specify every reverse proxy IP address in your environment.
  * This setting is required if $settings['reverse_proxy'] is TRUE.
  */
-$settings['reverse_proxy_addresses'] = [
-  // Docker network.
-  '172.19.0.0/16',
-];
+ $settings['reverse_proxy_addresses'] = [
+   '10.0.0.0/8',
+   '172.16.0.0/12',
+   '192.168.0.0/16',
+ ];
 
 /**
  * Set this value if your proxy server sends the client IP in a header
