@@ -10,7 +10,8 @@
     "drupal/imagemagick": "^2.2.0",
     "drush/drush": "~8.0",
     "drupal/console": "^1.2.0",
-    "drupal/swiftmailer": "^1.0"
+    "drupal/swiftmailer": "^1.0",
+    "drupal/schema_metatag": "^1.4"
   },
   "replace": {
     "drupal/drupal": "~8.0"
