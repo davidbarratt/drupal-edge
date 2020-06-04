@@ -9,7 +9,7 @@ services:
       - smtp
     volumes:
       - ./:/var/www:cached
-    command: 'sh -c "composer install -d /var/www && apache2-foreground"'
+    command: 'sh -c "composer install -d /var/www && apache2-foreground "'
   smtp:
     image: sj26/mailcatcher
     ports:

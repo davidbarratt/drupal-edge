@@ -8,6 +8,9 @@ services:
     environment:
       VIRTUAL_HOST: davidwbarratt.com,origin.davidwbarratt.com,www.davidwbarratt.com
       LETSENCRYPT_HOST: davidwbarratt.com,origin.davidwbarratt.com,www.davidwbarratt.com
+    volumes:
+      - files:/var/www/html/sites/default/files
+      - tmp:/var/www/tmp
   cron:
     restart: always
 networks:

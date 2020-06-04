@@ -4,9 +4,6 @@ services:
     image: davidbarratt/davidwbarratt
     env_file:
       - .env
-    volumes:
-      - files:/var/www/html/sites/default/files
-      - tmp:/var/www/tmp
   cron:
     image: davidbarratt/cron
     env_file:
