@@ -8,13 +8,13 @@
     "drupal/core": "^8.7.0",
     "drupal/stage_file_proxy": "^1.0@alpha",
     "drupal/imagemagick": "^3.1",
-    "drush/drush": "~8.0",
     "drupal/console": "^1.2.0",
     "drupal/swiftmailer": "^2.0",
     "drupal/schema_metatag": "^1.4",
     "drupal/name": "^1.0@RC",
     "cweagans/composer-patches": "^1.6",
-    "drupal/upgrade_status": "^2.0"
+    "drupal/upgrade_status": "^2.0",
+    "drush/drush": "^10.2.2"
   },
   "replace": {
     "drupal/drupal": "~8.0"
