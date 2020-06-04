@@ -1,6 +1,7 @@
 .well-known
 .env
 .git
+docker-compose.override.yml
 node_modules
 /files
 /tmp

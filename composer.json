@@ -13,7 +13,8 @@
     "drupal/swiftmailer": "^1.0",
     "drupal/schema_metatag": "^1.4",
     "drupal/name": "^1.0@RC",
-    "cweagans/composer-patches": "^1.6"
+    "cweagans/composer-patches": "^1.6",
+    "drupal/upgrade_status": "^2.0"
   },
   "replace": {
     "drupal/drupal": "~8.0"
