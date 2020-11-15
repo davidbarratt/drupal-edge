@@ -10,6 +10,9 @@ services:
     volumes:
       - ./:/var/www:cached
     command: 'sh -c "composer install -d /var/www && apache2-foreground "'
+    user: 'dev'
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: 0
   smtp:
     image: sj26/mailcatcher
     ports:

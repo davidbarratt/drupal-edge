@@ -1,5 +1,21 @@
 FROM davidbarratt/drupal:8
 
+# @TODO Move this into the drupal container?
+
+# Add a non-root user for development.
+ARG USERNAME=dev
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
+
+# Add gpg for signing commits.
+RUN apt-get update && apt-get install -y \
+  gnupg2 \
+  && rm -rf /var/lib/apt/lists/*
+
 COPY ./ /var/www
 
 RUN composer --no-dev install -d /var/www
