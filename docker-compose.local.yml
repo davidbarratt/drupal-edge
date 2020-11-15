@@ -10,9 +10,6 @@ services:
     volumes:
       - ./:/var/www:cached
     # command: 'sh -c "composer install -d /var/www && apache2-foreground "'
-    user: 'dev'
-    sysctls:
-      net.ipv4.ip_unprivileged_port_start: 0
     environment:
       APP_DEBUG: ${APP_DEBUG:-1}
       SMTP_HOST: ${SMTP_HOST:-smtp}
