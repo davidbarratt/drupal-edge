@@ -4,7 +4,6 @@ services:
     image: davidbarratt/davidwbarratt
     environment:
       COMPOSER_MEMORY_LIMIT: -1
-      
   cron:
     image: davidbarratt/cron
     links:
