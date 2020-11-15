@@ -11,8 +11,9 @@ ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
 
-# Add gpg for signing commits.
+# Add ssh & gpg for pushing & signing commits.
 RUN apt-get update && apt-get install -y \
+  openssh-client \
   gnupg2 \
   && rm -rf /var/lib/apt/lists/*
 
