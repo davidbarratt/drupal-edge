@@ -2,12 +2,11 @@ version: '3'
 services:
   web:
     image: davidbarratt/davidwbarratt
-    env_file:
-      - .env
+    environment:
+      COMPOSER_MEMORY_LIMIT: -1
+      
   cron:
     image: davidbarratt/cron
-    env_file:
-      - .env
     links:
       - web
 volumes:
