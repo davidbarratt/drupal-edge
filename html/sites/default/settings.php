@@ -806,3 +806,10 @@ $databases['default']['default'] = array (
   'namespace' => 'Drupal\\Core\\Database\\Driver\\sqlite',
   'driver' => 'sqlite',
 );
+$databases['default']['default'] = array (
+  'database' => 'sites/default/files/.ht.sqlite',
+  'prefix' => '',
+  'namespace' => 'Drupal\\Core\\Database\\Driver\\sqlite',
+  'driver' => 'sqlite',
+);
+$settings['hash_salt'] = '91wwkgBLR5qMLeG5S7_JKkeJj_m1li-zs2dkYbsmVhgl6bbQW6OvJ2UTobO9oL8Xwtuvy5ztdw';
