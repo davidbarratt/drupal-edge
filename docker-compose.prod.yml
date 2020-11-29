@@ -5,8 +5,6 @@ services:
     networks:
       - default
       - ingress
-    env_file:
-      - .env
     environment:
       VIRTUAL_HOST: davidwbarratt.com,origin.davidwbarratt.com,www.davidwbarratt.com
       LETSENCRYPT_HOST: davidwbarratt.com,origin.davidwbarratt.com,www.davidwbarratt.com
