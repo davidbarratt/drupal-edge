@@ -1,0 +1,46 @@
+uuid: fd3ecd0d-80a7-4791-97f5-b78fdc11980b
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.user.token
+    - field.field.user.user.field_image
+    - field.field.user.user.field_name
+    - field.field.user.user.field_picture
+    - field.field.user.user.field_social
+  module:
+    - link
+    - media
+    - user
+_core:
+  default_config_hash: V51QPCKkgNREKtSmB9Iu2wmAMEpktVpnzklWaZV8UYo
+id: user.user.token
+targetEntityType: user
+bundle: user
+mode: token
+content:
+  field_image:
+    type: media_thumbnail
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+  field_social:
+    type: link
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: true
+      url_plain: true
+      rel: '0'
+      target: '0'
+    third_party_settings: {  }
+hidden:
+  field_name: true
+  field_picture: true
+  member_for: true

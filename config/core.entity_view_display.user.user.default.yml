@@ -3,35 +3,22 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.user.user.user_picture
-    - image.style.thumbnail
+    - field.field.user.user.field_image
+    - field.field.user.user.field_name
+    - field.field.user.user.field_picture
+    - field.field.user.user.field_social
   module:
-    - field_layout
-    - image
     - user
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings: {  }
 _core:
   default_config_hash: V51QPCKkgNREKtSmB9Iu2wmAMEpktVpnzklWaZV8UYo
 id: user.user.default
 targetEntityType: user
 bundle: user
 mode: default
-content:
-  member_for:
-    weight: 5
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  user_picture:
-    type: image
-    weight: 0
-    region: content
-    settings:
-      image_style: thumbnail
-      image_link: content
-    third_party_settings: {  }
-    label: hidden
-hidden: {  }
+content: {  }
+hidden:
+  field_image: true
+  field_name: true
+  field_picture: true
+  field_social: true
+  member_for: true

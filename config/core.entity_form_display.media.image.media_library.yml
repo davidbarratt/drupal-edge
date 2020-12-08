@@ -9,14 +9,8 @@ dependencies:
     - image.style.thumbnail
     - media.type.image
   module:
-    - field_layout
     - image
-    - layout_discovery
     - link
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings: {  }
 _core:
   default_config_hash: PlyfyVZfALLkP7nbxLpaVKIDUWRioZghWpFDv0_rJ68
 id: media.image.media_library

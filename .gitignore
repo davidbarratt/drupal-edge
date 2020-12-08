@@ -6,9 +6,4 @@ node_modules
 /files
 /tmp
 vendor
-/html/core
-/html/modules/contrib
-/html/themes/contrib
-/html/profiles/contrib
-/html/sites/*/files
-/html/sites/*/private
+/web

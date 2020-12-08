@@ -5,6 +5,6 @@ features:
   favicon: true
 logo:
   use_default: false
-  path: ''
+  path: 'public://dwb.svg'
 favicon:
   use_default: true

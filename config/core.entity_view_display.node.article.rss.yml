@@ -8,15 +8,11 @@ dependencies:
     - field.field.node.article.comment
     - field.field.node.article.field_image
     - field.field.node.article.field_tags
+    - field.field.node.article.field_update
     - node.type.article
   module:
-    - field_layout
     - text
     - user
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings: {  }
 _core:
   default_config_hash: 2rIr6K5Q0UQ9khg0zE_CK-PtJH76UL-BDDZcZnZzwCc
 id: node.article.rss
@@ -35,4 +31,5 @@ hidden:
   comment: true
   field_image: true
   field_tags: true
+  field_update: true
   links: true

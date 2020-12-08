@@ -9,12 +9,7 @@ dependencies:
     - image.style.medium
     - media.type.image
   module:
-    - field_layout
     - image
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings: {  }
 _core:
   default_config_hash: PaGXvzRcL9eII--JV4eCVfObjrNo0l-u1dB_WJtB9ig
 id: media.image.media_library

@@ -8,15 +8,9 @@ dependencies:
     - image.style.thumbnail
     - media.type.image
   module:
-    - field_layout
     - image
-    - layout_discovery
     - link
     - path
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings: {  }
 _core:
   default_config_hash: nZlttO4YMwMCpkhYMz7bQ1ZMjABGc59YY1us3eSfvTY
 id: media.image.default
@@ -74,6 +68,7 @@ content:
       match_operator: CONTAINS
       size: 60
       placeholder: ''
+      match_limit: 10
     region: content
     third_party_settings: {  }
 hidden: {  }

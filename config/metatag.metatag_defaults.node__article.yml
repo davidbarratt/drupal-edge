@@ -1,0 +1,33 @@
+uuid: ec345150-20c7-4d15-a7b2-614a914d5e6d
+langcode: en
+status: true
+dependencies: {  }
+id: node__article
+label: 'Content: Article'
+tags:
+  article_published_time: '[node:created:html_datetime]'
+  article_modified_time: '[node:changed:html_datetime]'
+  og_image: '[node:field_image:entity:thumbnail:max_2600x2600]'
+  twitter_cards_image_width: '[node:field_image:entity:thumbnail:max_2600x2600:width]'
+  twitter_cards_image_height: '[node:field_image:entity:thumbnail:max_2600x2600:height]'
+  twitter_cards_image: '[node:field_image:entity:thumbnail:max_2600x2600]'
+  schema_article_main_entity_of_page: '[current-page:url]'
+  schema_article_name: '[node:title]'
+  schema_article_author: 'a:2:{s:5:"@type";s:6:"Person";s:3:"@id";s:36:"[node:author:url:unaliased:absolute]";}'
+  schema_article_description: '[node:summary]'
+  schema_article_publisher: 'a:2:{s:5:"@type";s:6:"Person";s:3:"@id";s:36:"[node:author:url:unaliased:absolute]";}'
+  schema_article_headline: '[node:title]'
+  schema_article_type: BlogPosting
+  schema_article_image: 'a:5:{s:5:"@type";s:11:"ImageObject";s:20:"representativeOfPage";s:4:"True";s:3:"url";s:49:"[node:field_image:entity:thumbnail:max_2600x2600]";s:5:"width";s:55:"[node:field_image:entity:thumbnail:max_2600x2600:width]";s:6:"height";s:56:"[node:field_image:entity:thumbnail:max_2600x2600:height]";}'
+  schema_article_is_accessible_for_free: 'True'
+  schema_article_date_published: '[node:created:html_datetime]'
+  schema_article_date_modified: '[node:changed:html_datetime]'
+  schema_person_family_name: '[node:author:field_name:family]'
+  schema_person_additional_name: '[node:author:field_name:middle]'
+  schema_person_name: '[node:author:display-name]'
+  schema_person_url: '[user:url:absolute]'
+  schema_person_id: '[node:author:url:unaliased:absolute]'
+  schema_person_type: Person
+  schema_person_given_name: '[node:author:field_name:given]'
+  schema_person_image: 'a:4:{s:5:"@type";s:11:"ImageObject";s:3:"url";s:58:"[node:author:field_picture:entity:thumbnail:max_2600x2600]";s:5:"width";s:64:"[node:author:field_picture:entity:thumbnail:max_2600x2600:width]";s:6:"height";s:65:"[node:author:field_picture:entity:thumbnail:max_2600x2600:height]";}'
+  schema_person_same_as: '[user:field_social]'

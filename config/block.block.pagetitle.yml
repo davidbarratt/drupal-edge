@@ -2,6 +2,8 @@ uuid: 8cd7c32f-0e76-4102-be26-8ca1c2766605
 langcode: en
 status: true
 dependencies:
+  module:
+    - system
   theme:
     - bartik
 id: pagetitle
@@ -15,4 +17,9 @@ settings:
   label: 'Page title'
   provider: core
   label_display: '0'
-visibility: {  }
+visibility:
+  request_path:
+    id: request_path
+    pages: '<front>'
+    negate: true
+    context_mapping: {  }

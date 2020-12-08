@@ -8,9 +8,9 @@ services:
       - 8888:80
     sysctls:
       net.ipv4.ip_unprivileged_port_start: 0
-    command: 'sh -c "composer install -d /var/www && apache2-foreground "'
+    command: 'sh -c "composer install && apache2-foreground "'
     volumes:
-      - ./:/var/www:cached
+      - ./:/opt/drupal:cached
   smtp:
     image: sj26/mailcatcher
     ports:

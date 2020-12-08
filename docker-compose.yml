@@ -6,7 +6,7 @@ services:
       - .env
     environment:
       COMPOSER_MEMORY_LIMIT: -1
-      COMPOSER_CACHE_DIR: /var/www/tmp/composer
+      COMPOSER_CACHE_DIR: /opt/drupal/tmp/composer
   cron:
     image: davidbarratt/cron
     links:

@@ -8,13 +8,8 @@ dependencies:
     - media.type.image
     - responsive_image.styles.wide
   module:
-    - field_layout
     - link
     - responsive_image
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings: {  }
 _core:
   default_config_hash: jOwnt_yq6AKAfqU6f0xKnxEkFQ2eTPJWxrk3WMLbL68
 id: media.image.default
@@ -33,7 +28,7 @@ content:
     region: content
   field_source:
     weight: 2
-    label: hidden
+    label: inline
     settings:
       trim_length: 80
       url_only: false

@@ -1,0 +1,33 @@
+uuid: 78d4c5ec-d609-456c-aad1-cf1145359b50
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: MvQPTbQx0Vxwy0ordSHyixdZmLCMpvMdLD69dlwkrKc
+id: user
+label: User
+tags:
+  canonical_url: '[user:url:absolute]'
+  shortlink: '[user:url:absolute]'
+  title: '[site:name]'
+  og_url: '[user:url:absolute]'
+  og_image: '[user:field_image:entity:thumbnail:max_2600x2600]'
+  og_type: profile
+  twitter_cards_image: '[user:field_image:entity:thumbnail:max_2600x2600]'
+  twitter_cards_page_url: '[user:url:absolute]'
+  schema_item_list_main_entity_of_page: '[current-page:url:absolute]'
+  schema_item_list_type: ItemList
+  schema_item_list_item_list_element: 'user_content:block_2:[user:uid]'
+  schema_person_family_name: '[user:field_name:family]'
+  schema_person_additional_name: '[user:field_name:middle]'
+  schema_person_name: '[user:display-name]'
+  schema_person_url: '[user:url:absolute]'
+  schema_person_id: '[user:url:unaliased:absolute]'
+  schema_person_type: Person
+  schema_person_given_name: '[user:field_name:given]'
+  schema_person_image: 'a:4:{s:5:"@type";s:11:"ImageObject";s:3:"url";s:51:"[user:field_picture:entity:thumbnail:max_2600x2600]";s:5:"width";s:57:"[user:field_picture:entity:thumbnail:max_2600x2600:width]";s:6:"height";s:58:"[user:field_picture:entity:thumbnail:max_2600x2600:height]";}'
+  schema_person_same_as: '[user:field_social]'
+  schema_web_page_author: 'a:2:{s:5:"@type";s:6:"Person";s:3:"@id";s:29:"[user:url:unaliased:absolute]";}'
+  schema_web_page_type: ProfilePage
+  schema_web_page_id: '[current-page:url:absolute]'
+  schema_web_page_publisher: 'a:2:{s:5:"@type";s:6:"Person";s:3:"@id";s:29:"[user:url:unaliased:absolute]";}'

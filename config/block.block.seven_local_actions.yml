@@ -1,15 +1,15 @@
-uuid: 35aee455-2b35-4c58-b391-8de1d7c530a0
+uuid: 67c50a4c-f7b9-4eb9-84a7-69df3b23134e
 langcode: en
 status: true
 dependencies:
   theme:
     - seven
 _core:
-  default_config_hash: HHryZVJbeKi9WnuBGC8FOhBZmBnk2G1H6KxFuy-rC9A
+  default_config_hash: 13GQpeITIJsp1kyPniXtWZfyFH87vb1xxJCHifL4UeE
 id: seven_local_actions
 theme: seven
 region: content
-weight: -10
+weight: -2
 provider: null
 plugin: local_actions_block
 settings:
