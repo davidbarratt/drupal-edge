@@ -1,0 +1,3 @@
+name = "davidwbarratt"
+type = "webpack"
+route = "davidwbarratt.com/*"

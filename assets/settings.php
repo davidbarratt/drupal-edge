@@ -657,9 +657,9 @@ foreach ($smtp as $key) {
   }
 }
 
-$config['cloudflare.settings']['apikey'] = $_SERVER['CLOUDFLARE_API_KEY'] ?? '';
-$config['cloudflare.settings']['email'] = $_SERVER['CLOUDFLARE_EMAIL'] ?? '';
-$config['cloudflare.settings']['zone_id'] = $_SERVER['CLOUDFLARE_ZONE'] ?? '';
+$config['cloudflare.settings']['apikey'] = $_SERVER['CF_API_KEY'] ?? '';
+$config['cloudflare.settings']['email'] = $_SERVER['CF_EMAIL'] ?? '';
+$config['cloudflare.settings']['zone_id'] = $_SERVER['CF_ZONE_ID'] ?? '';
 
 /**
  * Fast 404 pages:
