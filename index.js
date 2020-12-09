@@ -16,7 +16,7 @@ async function handleRequest(event) {
   if (request.headers.has('Cookie')) {
     const cookies = parse(request.headers.get('Cookie'));
 
-    const hasSessionCookie = !!Object.keys(cookies).find((name) => name.startsWith('SESS'));
+    const hasSessionCookie = !!Object.keys(cookies).find((name) => name.startsWith('SSESS'));
 
     if (hasSessionCookie) {
       return fetch(request);
