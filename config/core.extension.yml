@@ -21,6 +21,7 @@ module:
   file_mdm: 0
   file_mdm_exif: 0
   filter: 0
+  http_cache_control: 0
   image: 0
   imagemagick: 0
   layout_discovery: 0

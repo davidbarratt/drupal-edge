@@ -22,6 +22,7 @@
         "drupal/core-composer-scaffold": "^9.1",
         "drupal/core-project-message": "^9.1",
         "drupal/core-recommended": "^9.1",
+        "drupal/http_cache_control": "^2.0",
         "drupal/imagemagick": "^3.1",
         "drupal/name": "^1.0@RC",
         "drupal/purge": "^3.0",
