@@ -1,5 +1,7 @@
 import { parse } from 'cookie';
 
+const METHODS = new Set(['HEAD', 'GET']);
+
 /**
  * Respond with hello worker text
  * @param {Request} request
@@ -7,8 +9,8 @@ import { parse } from 'cookie';
 async function handleRequest(event) {
   const { request } = event;
 
-  // Bypass for methods other than GET
-  if (request.method !== 'GET') {
+  // Bypass for methods other than HEAD & GET
+  if (!METHODS.has(request.method)) {
     return fetch(request);
   }
 
