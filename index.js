@@ -32,7 +32,13 @@ async function handleRequest(event) {
   }
 
   // Cache MISS
-  const response = await fetch(request);
+  const originResponse = await fetch(request);
+
+  // Recreate the response so we can modify the headers
+  const response = new Response(originResponse.body, originResponse)
+
+  // Set CORS headers
+  response.headers.set('Access-Control-Allow-Origin', '*');
 
   // Bypass on static content.
   if (response.headers.get('CF-Cache-Status') !== 'DYNAMIC') {
