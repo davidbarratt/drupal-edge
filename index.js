@@ -3,7 +3,7 @@ import { parse } from 'cookie';
 const METHODS = new Set(['HEAD', 'GET']);
 
 function headResponse(original) {
-  const response = new Response('', origin);
+  const response = new Response('', original);
   return response;
 }
 
