@@ -1,7 +1,0 @@
-uuid: 92f52722-641b-4fbc-b125-edaaf1a8bfeb
-langcode: en
-status: true
-dependencies: {  }
-id: media__image
-label: 'Media: Image'
-tags: {  }

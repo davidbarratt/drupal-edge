@@ -1,11 +1,4 @@
-.well-known
 .env
-.git
-docker-compose.override.yml
 node_modules
 /dist
-/files
-/tmp
-vendor
-/web
 /worker
