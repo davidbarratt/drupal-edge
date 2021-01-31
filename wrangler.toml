@@ -1,3 +1,17 @@
-name = "drupal"
 type = "webpack"
-workers_dev = true
+
+[env.davidwbarratt]
+name = "davidwbarratt"
+routes = [
+  "davidwbarratt.com/*",
+  "www.davidwbarratt.com/*"
+]
+zone_id = 3b6f1e19b88afbccf143054ad2cdd45f
+
+[env.sailvenice]
+name = "sailvenice"
+routes = [
+  "sailvenice.com/*",
+  "www.sailvenice.com/*"
+]
+zone_id = 964341c0dab8a75b0a7846e209cadeb4
