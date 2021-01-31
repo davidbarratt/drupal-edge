@@ -1,6 +1,7 @@
 import { parse } from 'cookie';
 
 const METHODS = new Set(['HEAD', 'GET']);
+const PURGE_CACHE_TAGS = 'Purge-Cache-Tags';
 
 function headResponse(original) {
   const response = new Response('', original);
@@ -15,6 +16,29 @@ function modifyResponse(original) {
   response.headers.set('Access-Control-Allow-Origin', '*');
 
   return response;
+}
+
+async function cacheResponse(request, response) {
+  const cache = caches.default;
+  const cachePut = cache.put(request, response.clone());
+
+  if (!request.headers.has(PURGE_CACHE_TAGS)) {
+    return cachePut;
+  }
+
+  const tags = request.headers.get(PURGE_CACHE_TAGS).split(' ').map(async (tag) => {
+    const existing = (await CACHE_TAG.get(tag, 'json')) || [];
+
+    return CACHE_TAG.put(tag, JSON.stringify(Array.from(new Set([
+      ...existing,
+      request.url,
+    ]))));
+  });
+
+  return Promise.all([
+    cachePut,
+    ...tags,
+  ])
 }
 
 /**
@@ -67,7 +91,7 @@ async function handleRequest(event) {
     response.headers.set('Cache-Control', 'public, max-age=2628000, s-maxage=31536000');
   }
 
-  event.waitUntil(cache.put(request, response.clone()));
+  event.waitUntil(cacheResponse(request, response))
 
   return request.method === 'HEAD' ? headResponse(response) : response;;
 }

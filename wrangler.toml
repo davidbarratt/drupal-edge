@@ -2,16 +2,22 @@ type = "webpack"
 
 [env.davidwbarratt]
 name = "davidwbarratt"
+zone_id = "3b6f1e19b88afbccf143054ad2cdd45f"
 routes = [
   "davidwbarratt.com/*",
   "www.davidwbarratt.com/*"
 ]
-zone_id = "3b6f1e19b88afbccf143054ad2cdd45f"
+kv_namespaces = [
+  { binding = "CACHE_TAG", id = "d942922137cb47169c2001544614152a", preview_id = "a0d9cb88ce17449b96ee83ed405f0619" }
+]
 
 [env.sailvenice]
 name = "sailvenice"
+zone_id = "964341c0dab8a75b0a7846e209cadeb4"
 routes = [
   "sailvenice.com/*",
   "www.sailvenice.com/*"
 ]
-zone_id = "964341c0dab8a75b0a7846e209cadeb4"
+kv_namespaces = [
+  { binding = "CACHE_TAG", id = "bf385c95164c4944bc043f0e1b64a1aa", preview_id = "34d27674259c4bc9957dab751c0dfc97" }
+]
