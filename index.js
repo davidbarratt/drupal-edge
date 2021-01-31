@@ -22,11 +22,11 @@ async function cacheResponse(request, response) {
   const cache = caches.default;
   const cachePut = cache.put(request, response.clone());
 
-  if (!request.headers.has(PURGE_CACHE_TAGS)) {
+  if (!response.headers.has(PURGE_CACHE_TAGS)) {
     return cachePut;
   }
 
-  const tags = request.headers.get(PURGE_CACHE_TAGS).split(' ').map(async (tag) => {
+  const tags = response.headers.get(PURGE_CACHE_TAGS).split(' ').map(async (tag) => {
     const existing = (await CACHE_TAG.get(tag, 'json')) || [];
 
     return CACHE_TAG.put(tag, JSON.stringify(Array.from(new Set([
@@ -72,9 +72,9 @@ async function handleRequest(event) {
   });
 
   // Cache HIT
-  if (cachedResponse) {
-    return request.method === 'HEAD' ? headResponse(cachedResponse) : cachedResponse;
-  }
+  // if (cachedResponse) {
+  //   return request.method === 'HEAD' ? headResponse(cachedResponse) : cachedResponse;
+  // }
 
   // Cache MISS
   const originResponse = await fetch(request);
