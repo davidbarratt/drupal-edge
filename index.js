@@ -72,9 +72,9 @@ async function handleRequest(event) {
   });
 
   // Cache HIT
-  // if (cachedResponse) {
-  //   return request.method === 'HEAD' ? headResponse(cachedResponse) : cachedResponse;
-  // }
+  if (cachedResponse) {
+    return request.method === 'HEAD' ? headResponse(cachedResponse) : cachedResponse;
+  }
 
   // Cache MISS
   const originResponse = await fetch(request);
