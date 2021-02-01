@@ -8,7 +8,7 @@ routes = [
   "www.davidwbarratt.com/*"
 ]
 kv_namespaces = [
-  { binding = "CACHE_TAG", id = "9c84052ddafd407f8631034bcb2485e4", preview_id = "a0d9cb88ce17449b96ee83ed405f0619" }
+  { binding = "CACHE_TAG", id = "d0b0458b641a4673a0a7602e9be3cca9", preview_id = "a0d9cb88ce17449b96ee83ed405f0619" }
 ]
 
 [env.sailvenice]

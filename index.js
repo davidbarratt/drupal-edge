@@ -30,7 +30,7 @@ async function cacheResponse(request, response) {
   const cacheKey = encode(request.url);
 
   const tags = response.headers.get(PURGE_CACHE_TAGS).split(' ').map((tag) => (
-    CACHE_TAG.put(`${tag}:${cacheKey}`, request.url)
+    CACHE_TAG.put(`${tag}|${cacheKey}`, request.url)
   ));
 
   return Promise.all([
@@ -83,6 +83,7 @@ async function handleRequest(event) {
     return response;
   }
 
+  // @TODO Cache any 'DYNAMIC' response that has cache tags.
   if (response.headers.get('CF-Cache-Status') === 'DYNAMIC' && response.status === 200) {
     response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=31536000');
   } else {
