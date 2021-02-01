@@ -83,9 +83,12 @@ async function handleRequest(event) {
     return response;
   }
 
-  // @TODO Cache any 'DYNAMIC' response that has cache tags.
-  if (response.headers.get('CF-Cache-Status') === 'DYNAMIC' && response.status === 200) {
-    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=31536000');
+  if (response.headers.get('CF-Cache-Status') === 'DYNAMIC') {
+    // @TODO Cache any 'DYNAMIC' response that has cache tags.
+    // If the response is dynamic, but is not a 200, do not cache.
+    if (response.status === 200) {
+      response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=31536000');
+    }
   } else {
     response.headers.set('Cache-Control', 'public, max-age=2628000, s-maxage=31536000');
   }
