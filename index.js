@@ -1,4 +1,5 @@
 import { parse } from 'cookie';
+import { encode } from 'base64url';
 
 const METHODS = new Set(['HEAD', 'GET']);
 const PURGE_CACHE_TAGS = 'Purge-Cache-Tags';
@@ -26,14 +27,11 @@ async function cacheResponse(request, response) {
     return cachePut;
   }
 
-  const tags = response.headers.get(PURGE_CACHE_TAGS).split(' ').map(async (tag) => {
-    const existing = (await CACHE_TAG.get(tag, 'json')) || [];
+  const cacheKey = encode(request.url);
 
-    return CACHE_TAG.put(tag, JSON.stringify(Array.from(new Set([
-      ...existing,
-      request.url,
-    ]))));
-  });
+  const tags = response.headers.get(PURGE_CACHE_TAGS).split(' ').map((tag) => (
+    CACHE_TAG.put(`${tag}:${cacheKey}`, request.url)
+  ));
 
   return Promise.all([
     cachePut,
