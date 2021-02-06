@@ -2,11 +2,8 @@
   "name": "@davidbarratt/drupal-edge",
   "main": "index.js",
   "license": "GPL-3.0-or-later",
-  "scripts": {
-    "dev": "sh -ac '. ./.env && wrangler dev'"
-  },
   "devDependencies": {
-    "@cloudflare/wrangler": "^1.12.2",
+    "@cloudflare/wrangler": "^1.12.3",
     "eslint": "^7.2.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-plugin-import": "^2.22.1",
@@ -16,6 +13,7 @@
   },
   "dependencies": {
     "base64url": "^3.0.1",
-    "cookie": "^0.4.1"
+    "cookie": "^0.4.1",
+    "rxjs": "^6.6.3"
   }
 }

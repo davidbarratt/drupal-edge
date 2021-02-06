@@ -1,8 +1,12 @@
 import { parse } from 'cookie';
-import { encode } from 'base64url';
+import { encode, decode } from 'base64url';
+import { BehaviorSubject, from, merge } from 'rxjs';
+import { bufferCount, flatMap, map, reduce, toArray,  } from 'rxjs/operators';
 
 const METHODS = new Set(['HEAD', 'GET']);
 const PURGE_CACHE_TAGS = 'Purge-Cache-Tags';
+const AUTHORIZATION = 'Authorization';
+const CONTENT_TYPE = 'Content-Type';
 
 function headResponse(original) {
   const response = new Response('', original);
@@ -36,7 +40,68 @@ async function cacheResponse(request, response) {
   return Promise.all([
     cachePut,
     ...tags,
-  ])
+  ]);
+}
+
+async function purgeTags(tags = []) {
+  return from(tags).pipe(
+    flatMap((tag) => {
+      const cursor$ = new BehaviorSubject();
+
+      return cursor$.pipe(
+        flatMap((cursor) => (
+          CACHE_TAG.list({
+            prefix: `${tag}|`,
+            cursor,
+          })
+        )),
+        flatMap(({ keys, list_complete: listComplete, cursor }) => {
+          if (listComplete) {
+            cursor$.complete();
+          } else {
+            cursor$.next(cursor);
+          }
+
+          return from(keys.map(({ name }) => {
+            const [, encodedUrl] = name.split('|');
+
+            return [name, decode(encodedUrl)];
+          }));
+        }),
+      );
+    }),
+    reduce(([keys, urls], [key, url]) => {
+      keys.add(key);
+      urls.add(url);
+      return [keys, urls];
+    }, [new Set(), new Set()]),
+    map(([keys, urls]) => [Array.from(keys), Array.from(urls)]),
+    flatMap(([keys, urls]) => {
+      const keys$ = from(keys).pipe(
+        flatMap(key => CACHE_TAG.delete(key))
+      );
+
+      const urls$ = from(urls).pipe(
+        // Cloudflare can purge 30 files per request.
+        bufferCount(30),
+        flatMap((files) => (
+          fetch(`https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache`, {
+            method: 'POST',
+            headers: {
+              [AUTHORIZATION]: `Bearer ${CF_API_TOKEN}`,
+              [CONTENT_TYPE]: 'application/json',
+            },
+            body: JSON.stringify({
+              files,
+            })
+          })
+        ))
+      );
+
+      return merge(keys$, urls$);
+    }),
+    toArray(),
+  ).toPromise();
 }
 
 /**
@@ -45,6 +110,43 @@ async function cacheResponse(request, response) {
  */
 async function handleRequest(event) {
   const { request } = event;
+  const url = new URL(request.url);
+
+  if (request.method === 'POST' && url.pathname === '/purge') {
+    if (typeof CF_API_TOKEN === 'undefined') {
+      return new Response('', {
+        status: 500,
+      });
+    }
+
+    if (!request.headers.has(AUTHORIZATION)) {
+      return new Response('', {
+        status: 401,
+      });
+    }
+
+    if (request.headers.get(AUTHORIZATION) !== `Bearer ${CF_API_TOKEN}`) {
+      return new Response('', {
+        status: 403,
+      });
+    }
+
+    const data = await request.json();
+
+    if (!data.tags) {
+      return new Response('', {
+        status: 400,
+      });
+    }
+
+    const tags = data.tags.split('|');
+
+    event.waitUntil(purgeTags(tags));
+
+    return new Response('', {
+      status: 202,
+    });
+  }
 
   // Bypass for methods other than HEAD & GET
   if (!METHODS.has(request.method)) {
