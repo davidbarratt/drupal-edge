@@ -30,10 +30,8 @@ async function cacheResponse(request, response) {
   const cachePut = cache.put(request, response.clone());
 
   if (!response.headers.has(CACHE_TAG)) {
-    return;
+    return cachePut;
   }
-
-  const cachePut = cache.put(request, response.clone());
 
   const cacheKey = encode(request.url);
 
