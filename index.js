@@ -4,7 +4,7 @@ import { BehaviorSubject, from, merge } from 'rxjs';
 import { bufferCount, flatMap, map, reduce, toArray,  } from 'rxjs/operators';
 
 const METHODS = new Set(['HEAD', 'GET']);
-const PURGE_CACHE_TAGS = 'Purge-Cache-Tags';
+const CACHE_TAG = 'Cache-Tag';
 const X_AUTH_EMAIL = 'X-Auth-Email';
 const X_AUTH_KEY = 'X-Auth-Key';
 const CF_ZONE = 'CF-Zone';
@@ -29,15 +29,27 @@ async function cacheResponse(request, response) {
   const cache = caches.default;
   const cachePut = cache.put(request, response.clone());
 
-  if (!response.headers.has(PURGE_CACHE_TAGS)) {
-    return cachePut;
+  if (!response.headers.has(CACHE_TAG)) {
+    return;
   }
+
+  const cachePut = cache.put(request, response.clone());
 
   const cacheKey = encode(request.url);
 
-  const tags = response.headers.get(PURGE_CACHE_TAGS).split(' ').map((tag) => (
-    CACHE_TAG.put(`${tag}|${cacheKey}`, request.url)
-  ));
+  const tags = response.headers.get(CACHE_TAG).split(',').reduce((acc, tag) => {
+    const trimmedTag = tag.trim();
+
+    // Ignore empty tags.
+    if (trimmedTag === '') {
+      return acc;
+    }
+
+    return [
+      ...acc,
+      CACHE_TAG.put([trimmedTag, cacheKey].join('|'), request.url)
+    ];
+  }, []);
 
   return Promise.all([
     cachePut,
@@ -217,7 +229,7 @@ async function handleRequest(event) {
 
   event.waitUntil(cacheResponse(request, response))
 
-  return request.method === 'HEAD' ? headResponse(response) : response;;
+  return request.method === 'HEAD' ? headResponse(response) : response;
 }
 
 // eslint-disable-next-line no-restricted-globals
