@@ -7,7 +7,6 @@ routes = [
   "davidwbarratt.com/*",
   "www.davidwbarratt.com/*"
 ]
-vars = { CF_ZONE_ID = "3b6f1e19b88afbccf143054ad2cdd45f" }
 kv_namespaces = [
   { binding = "CACHE_TAG", id = "d0b0458b641a4673a0a7602e9be3cca9", preview_id = "a0d9cb88ce17449b96ee83ed405f0619" }
 ]
@@ -19,7 +18,6 @@ routes = [
   "sailvenice.com/*",
   "www.sailvenice.com/*"
 ]
-vars = { CF_ZONE_ID = "964341c0dab8a75b0a7846e209cadeb4" }
 kv_namespaces = [
   { binding = "CACHE_TAG", id = "bf385c95164c4944bc043f0e1b64a1aa", preview_id = "34d27674259c4bc9957dab751c0dfc97" }
 ]

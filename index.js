@@ -5,7 +5,9 @@ import { bufferCount, flatMap, map, reduce, toArray,  } from 'rxjs/operators';
 
 const METHODS = new Set(['HEAD', 'GET']);
 const PURGE_CACHE_TAGS = 'Purge-Cache-Tags';
-const AUTHORIZATION = 'Authorization';
+const X_AUTH_EMAIL = 'X-Auth-Email';
+const X_AUTH_KEY = 'X-Auth-Key';
+const CF_ZONE = 'CF-Zone';
 const CONTENT_TYPE = 'Content-Type';
 
 function headResponse(original) {
@@ -43,7 +45,22 @@ async function cacheResponse(request, response) {
   ]);
 }
 
-async function purgeTags(tags = []) {
+function createCloudflareFetch(authEmail, authKey) {
+  return (resource, options = {}) => {
+    const url = new URL(resource, 'https://api.cloudflare.com/client/v4/');
+    return fetch(url, {
+      ...options,
+      headers: {
+        [X_AUTH_EMAIL]: authEmail,
+        [X_AUTH_KEY]: authKey,
+        [CONTENT_TYPE]: 'application/json',
+        ...(options.headers || {})
+      },
+    })
+  };
+}
+
+async function purgeTags(fetcher, zoneId, tags = []) {
   return from(tags).pipe(
     flatMap((tag) => {
       const cursor$ = new BehaviorSubject();
@@ -85,12 +102,8 @@ async function purgeTags(tags = []) {
         // Cloudflare can purge 30 files per request.
         bufferCount(30),
         flatMap((files) => (
-          fetch(`https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache`, {
+          fetcher(`zones/${zoneId}/purge_cache`, {
             method: 'POST',
-            headers: {
-              [AUTHORIZATION]: `Bearer ${CF_API_TOKEN}`,
-              [CONTENT_TYPE]: 'application/json',
-            },
             body: JSON.stringify({
               files,
             })
@@ -112,36 +125,43 @@ async function handleRequest(event) {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (request.method === 'POST' && url.pathname === '/purge') {
-    if (typeof CF_API_TOKEN === 'undefined') {
-      return new Response('', {
-        status: 500,
-      });
-    }
+  if (request.method === 'POST' && url.pathname === '/.cloudflare/purge') {
 
-    if (!request.headers.has(AUTHORIZATION)) {
+    if ( !request.headers.has(X_AUTH_EMAIL) || !request.headers.has(X_AUTH_KEY)) {
       return new Response('', {
         status: 401,
       });
     }
 
-    if (request.headers.get(AUTHORIZATION) !== `Bearer ${CF_API_TOKEN}`) {
-      return new Response('', {
-        status: 403,
-      });
-    }
-
-    const data = await request.json();
-
-    if (!data.tags) {
+    if (!request.headers.has(CF_ZONE)) {
       return new Response('', {
         status: 400,
       });
     }
 
-    const tags = data.tags.split('|');
+    const { tags } = await request.json();
 
-    event.waitUntil(purgeTags(tags));
+    if (!tags) {
+      return new Response('', {
+        status: 400,
+      });
+    }
+
+    const cloudflareFetch = createCloudflareFetch(request.headers.get(X_AUTH_EMAIL), request.headers.get(X_AUTH_KEY));
+    const zoneId = request.headers.get(CF_ZONE);
+
+    // Ensure the user has access to the specified zone.
+    const zoneResponse = await cloudflareFetch(`zones/${zoneId}`);
+
+    if (!zoneResponse.ok) {
+      return zoneResponse;
+    }
+
+    event.waitUntil(purgeTags(
+      cloudflareFetch,
+      zoneId,
+      tags,
+    ));
 
     return new Response('', {
       status: 202,
