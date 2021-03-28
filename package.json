@@ -3,8 +3,8 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "dev": "wrangler dev",
-    "preview": "wrangler preview --watch"
+    "dev": "wrangler dev --env dev",
+    "preview": "wrangler preview --env dev --watch"
   },
   "dependencies": {
     "base64url": "^3.0.1",

@@ -1,13 +1,15 @@
-type = "webpack"
 name = "drupal-edge"
 workers_dev = false
+type = "webpack"
+webpack_config = "webpack.config.js"
+
+[env.dev]
 zone_id = "3b6f1e19b88afbccf143054ad2cdd45f"
 route ="davidwbarratt.com/*"
 vars = { ENVIRONMENT = "dev" }
 kv_namespaces = [
   { binding = "CACHE_TAG", preview_id = "0d7e2a70c90d44868ed93d32c55d5bd8" }
 ]
-webpack_config = "webpack.config.js"
 
 [env.davidwbarratt]
 name = "davidwbarratt"

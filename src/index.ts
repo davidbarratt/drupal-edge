@@ -57,8 +57,8 @@ async function cacheResponse(request, response) {
   ]);
 }
 
-function createCloudflareFetch(authEmail, authKey) {
-  return (resource: string, options: RequestInit|undefined = {}) => {
+function createCloudflareFetch(authEmail: string, authKey: string) {
+  return (resource: string, options: RequestInit = {}) => {
     const url = new URL(resource, 'https://api.cloudflare.com/client/v4/');
     return fetch(url.toString(), {
       ...options,
