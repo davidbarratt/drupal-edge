@@ -4,7 +4,9 @@ import { BehaviorSubject, from, merge } from 'rxjs';
 import { bufferCount, flatMap, map, reduce, toArray,  } from 'rxjs/operators';
 
 const METHODS = new Set(['HEAD', 'GET']);
-const CACHE_TAG = 'Cache-Tag';
+// The `Cache-Tag` header is swallowed by Cloudflare before it reaches the
+// worker. We'll use a custom header name in the same format instead.
+const CACHE_TAG = 'x-Cache-Tag';
 const X_AUTH_EMAIL = 'X-Auth-Email';
 const X_AUTH_KEY = 'X-Auth-Key';
 const CF_ZONE = 'CF-Zone';
