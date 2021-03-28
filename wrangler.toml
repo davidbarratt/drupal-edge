@@ -1,4 +1,13 @@
 type = "webpack"
+name = "drupal-edge"
+workers_dev = false
+zone_id = "3b6f1e19b88afbccf143054ad2cdd45f"
+route ="davidwbarratt.com/*"
+vars = { ENVIRONMENT = "dev" }
+kv_namespaces = [
+  { binding = "CACHE_TAG", preview_id = "0d7e2a70c90d44868ed93d32c55d5bd8" }
+]
+webpack_config = "webpack.config.js"
 
 [env.davidwbarratt]
 name = "davidwbarratt"
@@ -7,8 +16,9 @@ routes = [
   "davidwbarratt.com/*",
   "www.davidwbarratt.com/*"
 ]
+vars = { ENVIRONMENT = "prod" }
 kv_namespaces = [
-  { binding = "CACHE_TAG", id = "d0b0458b641a4673a0a7602e9be3cca9", preview_id = "a0d9cb88ce17449b96ee83ed405f0619" }
+  { binding = "CACHE_TAG", id = "d0b0458b641a4673a0a7602e9be3cca9", preview_id = "e64ea151ae9e435abdc4b1e6fbbac307" }
 ]
 
 [env.sailvenice]
@@ -18,6 +28,7 @@ routes = [
   "sailvenice.com/*",
   "www.sailvenice.com/*"
 ]
+vars = { ENVIRONMENT = "prod" }
 kv_namespaces = [
   { binding = "CACHE_TAG", id = "bf385c95164c4944bc043f0e1b64a1aa", preview_id = "34d27674259c4bc9957dab751c0dfc97" }
 ]

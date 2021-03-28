@@ -1,12 +1,12 @@
 import { parse } from 'cookie';
-import { encode, decode } from 'base64url';
+import base64url from 'base64url';
 import { BehaviorSubject, from, merge } from 'rxjs';
 import { bufferCount, flatMap, map, reduce, toArray,  } from 'rxjs/operators';
 
 const METHODS = new Set(['HEAD', 'GET']);
 // The `Cache-Tag` header is swallowed by Cloudflare before it reaches the
 // worker. We'll use a custom header name in the same format instead.
-const CACHE_TAG = 'x-Cache-Tag';
+const X_CACHE_TAG = 'x-Cache-Tag';
 const X_AUTH_EMAIL = 'X-Auth-Email';
 const X_AUTH_KEY = 'X-Auth-Key';
 const CF_ZONE = 'CF-Zone';
@@ -31,13 +31,13 @@ async function cacheResponse(request, response) {
   const cache = caches.default;
   const cachePut = cache.put(request, response.clone());
 
-  if (!response.headers.has(CACHE_TAG)) {
+  if (!response.headers.has(X_CACHE_TAG)) {
     return cachePut;
   }
 
-  const cacheKey = encode(request.url);
+  const cacheKey = base64url.encode(request.url);
 
-  const tags = response.headers.get(CACHE_TAG).split(',').reduce((acc, tag) => {
+  const tags = response.headers.get(X_CACHE_TAG).split(',').reduce((acc, tag) => {
     const trimmedTag = tag.trim();
 
     // Ignore empty tags.
@@ -58,9 +58,9 @@ async function cacheResponse(request, response) {
 }
 
 function createCloudflareFetch(authEmail, authKey) {
-  return (resource, options = {}) => {
+  return (resource: string, options: RequestInit|undefined = {}) => {
     const url = new URL(resource, 'https://api.cloudflare.com/client/v4/');
-    return fetch(url, {
+    return fetch(url.toString(), {
       ...options,
       headers: {
         [X_AUTH_EMAIL]: authEmail,
@@ -75,7 +75,7 @@ function createCloudflareFetch(authEmail, authKey) {
 async function purgeTags(fetcher, zoneId, tags = []) {
   return from(tags).pipe(
     flatMap((tag) => {
-      const cursor$ = new BehaviorSubject();
+      const cursor$ = new BehaviorSubject(undefined);
 
       return cursor$.pipe(
         flatMap((cursor) => (
@@ -94,7 +94,7 @@ async function purgeTags(fetcher, zoneId, tags = []) {
           return from(keys.map(({ name }) => {
             const [, encodedUrl] = name.split('|');
 
-            return [name, decode(encodedUrl)];
+            return [name, base64url.decode(encodedUrl)];
           }));
         }),
       );
@@ -103,7 +103,7 @@ async function purgeTags(fetcher, zoneId, tags = []) {
       keys.add(key);
       urls.add(url);
       return [keys, urls];
-    }, [new Set(), new Set()]),
+    }, [new Set<string>(), new Set<string>()]),
     map(([keys, urls]) => [Array.from(keys), Array.from(urls)]),
     flatMap(([keys, urls]) => {
       const keys$ = from(keys).pipe(
@@ -169,6 +169,18 @@ async function handleRequest(event) {
       return zoneResponse;
     }
 
+    if (ENVIRONMENT === 'dev') {
+      const purgedTags = await purgeTags(
+        cloudflareFetch,
+        zoneId,
+        tags,
+      );
+
+      return new Response(JSON.stringify(purgedTags), {
+        status: 200,
+      });
+    }
+
     event.waitUntil(purgeTags(
       cloudflareFetch,
       zoneId,
@@ -227,7 +239,11 @@ async function handleRequest(event) {
     response.headers.set('Cache-Control', 'public, max-age=2628000, s-maxage=31536000');
   }
 
-  event.waitUntil(cacheResponse(request, response))
+  if (ENVIRONMENT === 'dev') {
+    await cacheResponse(request, response);
+  } else {
+    event.waitUntil(cacheResponse(request, response));
+  }
 
   return request.method === 'HEAD' ? headResponse(response) : response;
 }
