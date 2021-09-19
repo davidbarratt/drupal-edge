@@ -219,9 +219,6 @@ async function handleRequest(event) {
     url.searchParams.delete(name);
   });
 
-  console.log('REQUEST URL', request.url);
-  console.log('MODIFIED URL', url.toString());
-
   const cache = caches.default;
   const cachedResponse = await cache.match(url.toString());
 

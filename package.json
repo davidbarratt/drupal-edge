@@ -3,13 +3,15 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "scripts": {
+    "test": "eslint && tsc",
     "dev": "wrangler dev --env dev",
     "preview": "wrangler preview --env dev --watch"
   },
   "dependencies": {
     "base64url": "^3.0.1",
     "cookie": "^0.4.1",
-    "rxjs": "^6.6.3"
+    "rxjs": "^6.6.3",
+    "tracking-query-params-registry": "github:mpchadwick/tracking-query-params-registry"
   },
   "devDependencies": {
     "@babel/core": "^7.13.13",
@@ -24,7 +26,6 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.0.0",
-    "tracking-query-params-registry": "github:mpchadwick/tracking-query-params-registry",
     "typescript": "^4.2.3"
   }
 }
