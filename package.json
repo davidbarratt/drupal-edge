@@ -18,6 +18,8 @@
     "@babel/preset-typescript": "^7.13.0",
     "@cloudflare/workers-types": "^2.2.1",
     "@cloudflare/wrangler": "^1.15.0",
+    "@types/cookie": "^0.4.1",
+    "@types/node": "^16.9.4",
     "babel-loader": "^8.2.2",
     "csv-loader": "^3.0.3",
     "eslint": "^7.2.0",

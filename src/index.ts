@@ -4,8 +4,6 @@ import { BehaviorSubject, from, merge } from 'rxjs';
 import { bufferCount, flatMap, map, reduce, toArray,  } from 'rxjs/operators';
 import trackingData from 'tracking-query-params-registry/_data/params.csv';
 
-trackingData.map(item => console.log(item));
-
 const METHODS = new Set(['HEAD', 'GET']);
 // The `Cache-Tag` header is swallowed by Cloudflare before it reaches the
 // worker. We'll use a custom header name in the same format instead.
@@ -15,12 +13,12 @@ const X_AUTH_KEY = 'X-Auth-Key';
 const CF_ZONE = 'CF-Zone';
 const CONTENT_TYPE = 'Content-Type';
 
-function headResponse(original) {
+function headResponse(original: ResponseInit) {
   const response = new Response('', original);
   return response;
 }
 
-function modifyResponse(original) {
+function modifyResponse(original: Response) {
   // Recreate the response so we can modify the headers
   const response = new Response(original.body, original)
 
@@ -40,7 +38,7 @@ async function cacheResponse(url: string, response: Response) {
 
   const cacheKey = base64url.encode(url);
 
-  const tags = response.headers.get(X_CACHE_TAG).split(',').reduce((acc, tag) => {
+  const tags =  (response.headers.get(X_CACHE_TAG) as string).split(',').reduce<Promise<void>[]>((acc, tag) => {
     const trimmedTag = tag.trim();
 
     // Ignore empty tags.
@@ -60,9 +58,9 @@ async function cacheResponse(url: string, response: Response) {
   ]);
 }
 
-function createCloudflareFetch(authEmail: string, authKey: string) {
-  return (resource: string, options: RequestInit = {}) => {
-    const url = new URL(resource, 'https://api.cloudflare.com/client/v4/');
+function createCloudflareFetch(authEmail: string, authKey: string) : typeof fetch {
+  return (input: RequestInfo, options: RequestInit = {}) => {
+    const url = new URL(typeof input === 'string' ? input : input.url, 'https://api.cloudflare.com/client/v4/');
     return fetch(url.toString(), {
       ...options,
       headers: {
@@ -75,10 +73,10 @@ function createCloudflareFetch(authEmail: string, authKey: string) {
   };
 }
 
-async function purgeTags(fetcher, zoneId, tags = []) {
+async function purgeTags(fetcher: typeof fetch, zoneId: string, tags = []) {
   return from(tags).pipe(
     flatMap((tag) => {
-      const cursor$ = new BehaviorSubject(undefined);
+      const cursor$ = new BehaviorSubject<string | undefined>(undefined);
 
       return cursor$.pipe(
         flatMap((cursor) => (
@@ -132,11 +130,7 @@ async function purgeTags(fetcher, zoneId, tags = []) {
   ).toPromise();
 }
 
-/**
- * Respond with hello worker text
- * @param {Request} request
- */
-async function handleRequest(event) {
+async function handleRequest(event: FetchEvent) {
   const { request } = event;
   const url = new URL(request.url);
 
@@ -162,8 +156,11 @@ async function handleRequest(event) {
       });
     }
 
-    const cloudflareFetch = createCloudflareFetch(request.headers.get(X_AUTH_EMAIL), request.headers.get(X_AUTH_KEY));
-    const zoneId = request.headers.get(CF_ZONE);
+    const cloudflareFetch = createCloudflareFetch(
+      request.headers.get(X_AUTH_EMAIL) || '',
+      request.headers.get(X_AUTH_KEY) || ''
+    );
+    const zoneId = request.headers.get(CF_ZONE) || '';
 
     // Ensure the user has access to the specified zone.
     const zoneResponse = await cloudflareFetch(`zones/${zoneId}`);
@@ -203,7 +200,7 @@ async function handleRequest(event) {
 
   // Bypass on session cookie.
   if (request.headers.has('Cookie')) {
-    const cookies = parse(request.headers.get('Cookie'));
+    const cookies = parse(request.headers.get('Cookie') || '');
 
     const hasSessionCookie = !!Object.keys(cookies).find((name) => name.startsWith('SSESS'));
 
