@@ -14,6 +14,15 @@ module.exports = {
         use: {
           loader: "babel-loader",
         }
+      },
+      {
+        test: /\.csv$/,
+        loader: 'csv-loader',
+        options: {
+          dynamicTyping: true,
+          header: true,
+          skipEmptyLines: true
+        }
       }
     ]
   }

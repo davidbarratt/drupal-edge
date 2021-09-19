@@ -2,6 +2,9 @@ import { parse } from 'cookie';
 import base64url from 'base64url';
 import { BehaviorSubject, from, merge } from 'rxjs';
 import { bufferCount, flatMap, map, reduce, toArray,  } from 'rxjs/operators';
+import trackingData from 'tracking-query-params-registry/_data/params.csv';
+
+trackingData.map(item => console.log(item));
 
 const METHODS = new Set(['HEAD', 'GET']);
 // The `Cache-Tag` header is swallowed by Cloudflare before it reaches the
@@ -27,15 +30,15 @@ function modifyResponse(original) {
   return response;
 }
 
-async function cacheResponse(request, response) {
+async function cacheResponse(url: string, response: Response) {
   const cache = caches.default;
-  const cachePut = cache.put(request, response.clone());
+  const cachePut = cache.put(url, response.clone());
 
   if (!response.headers.has(X_CACHE_TAG)) {
     return cachePut;
   }
 
-  const cacheKey = base64url.encode(request.url);
+  const cacheKey = base64url.encode(url);
 
   const tags = response.headers.get(X_CACHE_TAG).split(',').reduce((acc, tag) => {
     const trimmedTag = tag.trim();
@@ -47,7 +50,7 @@ async function cacheResponse(request, response) {
 
     return [
       ...acc,
-      CACHE_TAG.put([trimmedTag, cacheKey].join('|'), request.url)
+      CACHE_TAG.put([trimmedTag, cacheKey].join('|'), url)
     ];
   }, []);
 
@@ -137,9 +140,9 @@ async function handleRequest(event) {
   const { request } = event;
   const url = new URL(request.url);
 
+  // Handle Purge Requests.
   if (request.method === 'POST' && url.pathname === '/.cloudflare/purge') {
-
-    if ( !request.headers.has(X_AUTH_EMAIL) || !request.headers.has(X_AUTH_KEY)) {
+    if (!request.headers.has(X_AUTH_EMAIL) || !request.headers.has(X_AUTH_KEY)) {
       return new Response('', {
         status: 401,
       });
@@ -210,10 +213,17 @@ async function handleRequest(event) {
     }
   }
 
-  const cache = caches.default;
-  const cachedResponse = await cache.match(request, {
-    ignoreMethod: true,
+  // Before looking up in cache or making a request to the origin, remove
+  // all tracking params.
+  trackingData.forEach(({ name }) => {
+    url.searchParams.delete(name);
   });
+
+  console.log('REQUEST URL', request.url);
+  console.log('MODIFIED URL', url.toString());
+
+  const cache = caches.default;
+  const cachedResponse = await cache.match(url.toString());
 
   // Cache HIT
   if (cachedResponse) {
@@ -221,7 +231,7 @@ async function handleRequest(event) {
   }
 
   // Cache MISS
-  const originResponse = await fetch(request);
+  const originResponse = await fetch(url.toString());
   const response = modifyResponse(originResponse);
 
   // Bypass on Set-Cookie
@@ -240,9 +250,9 @@ async function handleRequest(event) {
   }
 
   if (ENVIRONMENT === 'dev') {
-    await cacheResponse(request, response);
+    await cacheResponse(url.toString(), response);
   } else {
-    event.waitUntil(cacheResponse(request, response));
+    event.waitUntil(cacheResponse(url.toString(), response));
   }
 
   return request.method === 'HEAD' ? headResponse(response) : response;
