@@ -58,9 +58,11 @@ async function cacheResponse(url: string, response: Response) {
   ]);
 }
 
-function createCloudflareFetch(authEmail: string, authKey: string) : typeof fetch {
-  return (input: RequestInfo, options: RequestInit = {}) => {
-    const url = new URL(typeof input === 'string' ? input : input.url, 'https://api.cloudflare.com/client/v4/');
+type cloudflareFetch = (path: string, options?: RequestInit) => Promise<Response>;
+
+function createCloudflareFetch(authEmail: string, authKey: string) : cloudflareFetch {
+  return (path: string, options: RequestInit = {}) => {
+    const url = new URL(path, 'https://api.cloudflare.com/client/v4/');
     return fetch(url.toString(), {
       ...options,
       headers: {
@@ -73,7 +75,7 @@ function createCloudflareFetch(authEmail: string, authKey: string) : typeof fetc
   };
 }
 
-async function purgeTags(fetcher: typeof fetch, zoneId: string, tags = []) {
+async function purgeTags(fetcher: cloudflareFetch, zoneId: string, tags = []) {
   return from(tags).pipe(
     flatMap((tag) => {
       const cursor$ = new BehaviorSubject<string | undefined>(undefined);
