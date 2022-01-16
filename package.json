@@ -5,6 +5,7 @@
   "scripts": {
     "test": "eslint && tsc",
     "dev": "wrangler dev --env dev",
+    "build": "wrangler build",
     "preview": "wrangler preview --env dev --watch"
   },
   "dependencies": {
