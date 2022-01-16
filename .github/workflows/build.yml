@@ -16,6 +16,10 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       - run: terraform plan
       - if: github.ref == 'refs/heads/master'
         run: terraform apply
