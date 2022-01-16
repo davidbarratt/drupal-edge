@@ -1,8 +1,11 @@
 import { parse } from 'cookie';
-import base64url from 'base64url';
+import { decode, encode } from 'universal-base64url';
 import { BehaviorSubject, from, merge } from 'rxjs';
 import { bufferCount, flatMap, map, reduce, toArray,  } from 'rxjs/operators';
 import trackingData from 'tracking-query-params-registry/_data/params.csv';
+
+export { CacheTag } from './cache-tag';
+
 
 const METHODS = new Set(['HEAD', 'GET']);
 // The `Cache-Tag` header is swallowed by Cloudflare before it reaches the
@@ -36,7 +39,7 @@ async function cacheResponse(url: string, response: Response) {
     return cachePut;
   }
 
-  const cacheKey = base64url.encode(url);
+  const cacheKey = encode(url);
 
   const tags =  (response.headers.get(X_CACHE_TAG) as string).split(',').reduce<Promise<void>[]>((acc, tag) => {
     const trimmedTag = tag.trim();
@@ -97,7 +100,7 @@ async function purgeTags(fetcher: cloudflareFetch, zoneId: string, tags = []) {
           return from(keys.map(({ name }) => {
             const [, encodedUrl] = name.split('|');
 
-            return [name, base64url.decode(encodedUrl)];
+            return [name, decode(encodedUrl)];
           }));
         }),
       );
@@ -132,8 +135,7 @@ async function purgeTags(fetcher: cloudflareFetch, zoneId: string, tags = []) {
   ).toPromise();
 }
 
-async function handleRequest(event: FetchEvent) {
-  const { request } = event;
+async function handleRequest(request: Request, env: Env, ctx: ExecutionContext) {
   const url = new URL(request.url);
 
   // Handle Purge Requests.
@@ -171,19 +173,7 @@ async function handleRequest(event: FetchEvent) {
       return zoneResponse;
     }
 
-    if (ENVIRONMENT === 'dev') {
-      const purgedTags = await purgeTags(
-        cloudflareFetch,
-        zoneId,
-        tags,
-      );
-
-      return new Response(JSON.stringify(purgedTags), {
-        status: 200,
-      });
-    }
-
-    event.waitUntil(purgeTags(
+    ctx.waitUntil(purgeTags(
       cloudflareFetch,
       zoneId,
       tags,
@@ -245,16 +235,16 @@ async function handleRequest(event: FetchEvent) {
     response.headers.set('Cache-Control', 'public, max-age=2628000, s-maxage=31536000');
   }
 
-  if (ENVIRONMENT === 'dev') {
-    await cacheResponse(url.toString(), response);
-  } else {
-    event.waitUntil(cacheResponse(url.toString(), response));
-  }
+  ctx.waitUntil(cacheResponse(url.toString(), response));
 
   return request.method === 'HEAD' ? headResponse(response) : response;
 }
 
-// eslint-disable-next-line no-restricted-globals
-addEventListener('fetch', (event) => {
-  event.respondWith(handleRequest(event));
-});
+
+export default {
+  fetch: handleRequest,
+}
+
+interface Env {
+  CACHE_TAG: DurableObjectNamespace
+}
