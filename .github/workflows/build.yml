@@ -7,8 +7,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - run: terraform fmt -check -diff
@@ -24,5 +22,9 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       - run: terraform init
       - run: terraform plan
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
       - if: github.ref == 'refs/heads/master'
         run: terraform apply
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
