@@ -1,4 +1,11 @@
 terraform {
+  cloud {
+    organization = "davidbarratt"
+
+    workspaces {
+      name = "drupal-edge"
+    }
+  }
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
