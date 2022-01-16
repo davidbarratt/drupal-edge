@@ -22,10 +22,11 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       - run: terraform init
-      - run: terraform plan
+      - if: github.ref != 'refs/heads/master'
+        run: terraform plan
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
       - if: github.ref == 'refs/heads/master'
-        run: terraform apply
+        run: terraform apply -auto-approve
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
