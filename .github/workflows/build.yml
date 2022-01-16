@@ -17,7 +17,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - if: github.ref == 'refs/heads/master'
-        run: npm run publish
+        run: npm run deploy
         env:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
