@@ -1,20 +1,10 @@
 import { parse } from 'cookie';
-import { decode, encode } from 'universal-base64url';
-import { BehaviorSubject, from, merge } from 'rxjs';
-import { bufferCount, flatMap, map, reduce, toArray,  } from 'rxjs/operators';
 import trackingData from 'tracking-query-params-registry/_data/params.csv';
+import { METHODS, X_CACHE_TAG, X_AUTH_EMAIL, X_AUTH_KEY, CF_ZONE } from './constants';
+import createCloudflareFetch from './cloudflare';
 
 export { CacheTag } from './cache-tag';
 
-
-const METHODS = new Set(['HEAD', 'GET']);
-// The `Cache-Tag` header is swallowed by Cloudflare before it reaches the
-// worker. We'll use a custom header name in the same format instead.
-const X_CACHE_TAG = 'x-Cache-Tag';
-const X_AUTH_EMAIL = 'X-Auth-Email';
-const X_AUTH_KEY = 'X-Auth-Key';
-const CF_ZONE = 'CF-Zone';
-const CONTENT_TYPE = 'Content-Type';
 
 function headResponse(original: ResponseInit) {
   const response = new Response('', original);
@@ -31,108 +21,28 @@ function modifyResponse(original: Response) {
   return response;
 }
 
-async function cacheResponse(url: string, response: Response) {
+async function cacheResponse(url: URL, response: Response, env: Env) {
   const cache = caches.default;
-  const cachePut = cache.put(url, response.clone());
+  const cachePut = cache.put(url.toString(), response.clone());
+  const tagList = response.headers.get(X_CACHE_TAG) || '';
 
-  if (!response.headers.has(X_CACHE_TAG)) {
+  if (!tagList) {
     return cachePut;
   }
 
-  const cacheKey = encode(url);
+  const id = env.CACHE_TAG.idFromName(url.hostname);
+  const cacheTag = env.CACHE_TAG.get(id);
 
-  const tags =  (response.headers.get(X_CACHE_TAG) as string).split(',').reduce<Promise<void>[]>((acc, tag) => {
-    const trimmedTag = tag.trim();
-
-    // Ignore empty tags.
-    if (trimmedTag === '') {
-      return acc;
+  const tagger = cacheTag.fetch(url.toString(), {
+    headers: {
+      [X_CACHE_TAG]: tagList,
     }
-
-    return [
-      ...acc,
-      CACHE_TAG.put([trimmedTag, cacheKey].join('|'), url)
-    ];
-  }, []);
+  });
 
   return Promise.all([
     cachePut,
-    ...tags,
+    tagger,
   ]);
-}
-
-type cloudflareFetch = (path: string, options?: RequestInit) => Promise<Response>;
-
-function createCloudflareFetch(authEmail: string, authKey: string) : cloudflareFetch {
-  return (path: string, options: RequestInit = {}) => {
-    const url = new URL(path, 'https://api.cloudflare.com/client/v4/');
-    return fetch(url.toString(), {
-      ...options,
-      headers: {
-        [X_AUTH_EMAIL]: authEmail,
-        [X_AUTH_KEY]: authKey,
-        [CONTENT_TYPE]: 'application/json',
-        ...(options.headers || {})
-      },
-    })
-  };
-}
-
-async function purgeTags(fetcher: cloudflareFetch, zoneId: string, tags = []) {
-  return from(tags).pipe(
-    flatMap((tag) => {
-      const cursor$ = new BehaviorSubject<string | undefined>(undefined);
-
-      return cursor$.pipe(
-        flatMap((cursor) => (
-          CACHE_TAG.list({
-            prefix: `${tag}|`,
-            cursor,
-          })
-        )),
-        flatMap(({ keys, list_complete: listComplete, cursor }) => {
-          if (listComplete) {
-            cursor$.complete();
-          } else {
-            cursor$.next(cursor);
-          }
-
-          return from(keys.map(({ name }) => {
-            const [, encodedUrl] = name.split('|');
-
-            return [name, decode(encodedUrl)];
-          }));
-        }),
-      );
-    }),
-    reduce(([keys, urls], [key, url]) => {
-      keys.add(key);
-      urls.add(url);
-      return [keys, urls];
-    }, [new Set<string>(), new Set<string>()]),
-    map(([keys, urls]) => [Array.from(keys), Array.from(urls)]),
-    flatMap(([keys, urls]) => {
-      const keys$ = from(keys).pipe(
-        flatMap(key => CACHE_TAG.delete(key))
-      );
-
-      const urls$ = from(urls).pipe(
-        // Cloudflare can purge 30 files per request.
-        bufferCount(30),
-        flatMap((files) => (
-          fetcher(`zones/${zoneId}/purge_cache`, {
-            method: 'POST',
-            body: JSON.stringify({
-              files,
-            })
-          })
-        ))
-      );
-
-      return merge(keys$, urls$);
-    }),
-    toArray(),
-  ).toPromise();
 }
 
 async function handleRequest(request: Request, env: Env, ctx: ExecutionContext) {
@@ -173,11 +83,10 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext) 
       return zoneResponse;
     }
 
-    ctx.waitUntil(purgeTags(
-      cloudflareFetch,
-      zoneId,
-      tags,
-    ));
+    const id = env.CACHE_TAG.idFromName(url.hostname);
+    const cacheTag = env.CACHE_TAG.get(id);
+
+    ctx.waitUntil(cacheTag.fetch(request));
 
     return new Response('', {
       status: 202,
@@ -226,16 +135,15 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext) 
   }
 
   if (response.headers.get('CF-Cache-Status') === 'DYNAMIC') {
-    // @TODO Cache any 'DYNAMIC' response that has cache tags.
-    // If the response is dynamic, but is not a 200, do not cache.
-    if (response.status === 200) {
+    // If the response is dynamic, and has cache tags, it's cacheable.
+    if (response.headers.get(X_CACHE_TAG)) {
       response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=31536000');
     }
   } else {
     response.headers.set('Cache-Control', 'public, max-age=2628000, s-maxage=31536000');
   }
 
-  ctx.waitUntil(cacheResponse(url.toString(), response));
+  ctx.waitUntil(cacheResponse(url, response, env));
 
   return request.method === 'HEAD' ? headResponse(response) : response;
 }

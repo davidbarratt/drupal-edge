@@ -9,11 +9,9 @@
     "deploy": "wrangler publish"
   },
   "dependencies": {
-    "base64url": "^3.0.1",
     "cookie": "^0.4.1",
     "rxjs": "^6.6.3",
-    "tracking-query-params-registry": "github:mpchadwick/tracking-query-params-registry",
-    "universal-base64url": "^1.1.0"
+    "tracking-query-params-registry": "github:mpchadwick/tracking-query-params-registry"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.3.0",
