@@ -86,7 +86,7 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext) 
     const id = env.CACHE_TAG.idFromName(url.hostname);
     const cacheTag = env.CACHE_TAG.get(id);
 
-    ctx.waitUntil(cacheTag.fetch(request));
+    ctx.waitUntil(cacheTag.fetch(request.clone()));
 
     return new Response('', {
       status: 202,
