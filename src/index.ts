@@ -62,7 +62,8 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext) 
       });
     }
 
-    const { tags } = await request.json();
+    const clonedRequest = request.clone();
+    const { tags } = await clonedRequest.json();
 
     if (!tags) {
       return new Response('', {
@@ -86,7 +87,7 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext) 
     const id = env.CACHE_TAG.idFromName(url.hostname);
     const cacheTag = env.CACHE_TAG.get(id);
 
-    ctx.waitUntil(cacheTag.fetch(request.clone()));
+    ctx.waitUntil(cacheTag.fetch(request));
 
     return new Response('', {
       status: 202,
