@@ -34,3 +34,8 @@ vars = { ENVIRONMENT = "prod" }
 kv_namespaces = [
   { binding = "CACHE_TAG", id = "bf385c95164c4944bc043f0e1b64a1aa", preview_id = "34d27674259c4bc9957dab751c0dfc97" }
 ]
+
+[durable_objects]
+bindings = [
+  { name = "CACHE_TAG", class_name = "CacheTag" }
+]
