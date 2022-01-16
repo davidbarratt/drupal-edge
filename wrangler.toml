@@ -1,41 +1,23 @@
-name = "drupal-edge"
+name = "drupal"
+type = "javascript"
 workers_dev = false
-type = "webpack"
-webpack_config = "webpack.config.js"
+compatibility_date = "2022-01-16"
 
-[env.dev]
-zone_id = "3b6f1e19b88afbccf143054ad2cdd45f"
-route ="davidwbarratt.com/*"
-vars = { ENVIRONMENT = "dev" }
-kv_namespaces = [
-  { binding = "CACHE_TAG", preview_id = "0d7e2a70c90d44868ed93d32c55d5bd8" }
-]
+[build]
+command = "rollup --config"
 
-[env.davidwbarratt]
-name = "davidwbarratt"
-zone_id = "3b6f1e19b88afbccf143054ad2cdd45f"
-routes = [
-  "davidwbarratt.com/*",
-  "www.davidwbarratt.com/*"
-]
-vars = { ENVIRONMENT = "prod" }
-kv_namespaces = [
-  { binding = "CACHE_TAG", id = "d0b0458b641a4673a0a7602e9be3cca9", preview_id = "e64ea151ae9e435abdc4b1e6fbbac307" }
-]
-
-[env.sailvenice]
-name = "sailvenice"
-zone_id = "964341c0dab8a75b0a7846e209cadeb4"
-routes = [
-  "sailvenice.com/*",
-  "www.sailvenice.com/*"
-]
-vars = { ENVIRONMENT = "prod" }
-kv_namespaces = [
-  { binding = "CACHE_TAG", id = "bf385c95164c4944bc043f0e1b64a1aa", preview_id = "34d27674259c4bc9957dab751c0dfc97" }
-]
+[build.upload]
+format = "modules"
+main = "./worker.mjs"
 
 [durable_objects]
 bindings = [
   { name = "CACHE_TAG", class_name = "CacheTag" }
 ]
+
+[[migrations]]
+tag = "v1" # Should be unique for each entry
+new_classes = ["CacheTag"] # Array of new classes
+
+[miniflare]
+durable_objects_persist = true
