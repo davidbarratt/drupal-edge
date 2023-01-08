@@ -2,6 +2,7 @@ import { parse } from 'cookie';
 import trackingData from 'tracking-query-params-registry/_data/params.csv';
 import { METHODS, X_CACHE_TAG, X_AUTH_EMAIL, X_AUTH_KEY, CF_ZONE } from './constants';
 import createCloudflareFetch from './cloudflare';
+import { isPurgeRequestPayload } from './predicates';
 
 export { CacheTag } from './cache-tag';
 
@@ -63,7 +64,15 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext) 
     }
 
     const clonedRequest = request.clone();
-    const { tags } = await clonedRequest.json();
+    const data = await clonedRequest.json();
+
+    if (!isPurgeRequestPayload(data)) {
+      return new Response('', {
+        status: 400,
+      });
+    }
+
+    const { tags } = data;
 
     if (!tags) {
       return new Response('', {

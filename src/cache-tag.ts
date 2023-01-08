@@ -2,6 +2,7 @@ import { EMPTY, from } from 'rxjs';
 import { bufferCount, flatMap, toArray } from 'rxjs/operators';
 import createCloudflareFetch, { cloudflareFetch } from './cloudflare';
 import { CF_ZONE, X_AUTH_EMAIL, X_AUTH_KEY, X_CACHE_TAG } from './constants';
+import { isPurgeRequestPayload } from './predicates';
 
 export class CacheTag {
   state: DurableObjectState;
@@ -60,7 +61,13 @@ export class CacheTag {
     const url = new URL(request.url);
     // Handle Purge Requests.
     if (request.method === 'POST' && url.pathname === '/.cloudflare/purge') {
-      const { tags } = await request.json();
+      const data = await request.json();
+
+      if (!isPurgeRequestPayload(data)) {
+        throw new Error('Payload is malformed');
+      }
+
+      const { tags } = data;
 
       const cloudflareFetch = createCloudflareFetch(
         request.headers.get(X_AUTH_EMAIL) || '',
