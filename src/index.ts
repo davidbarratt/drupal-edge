@@ -118,6 +118,9 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext) 
     url.searchParams.delete(name);
   });
 
+  // Sort the query string to increase cache hits.
+  url.searchParams.sort();
+
   const cache = caches.default;
   const cachedResponse = await cache.match(url.toString());
 
