@@ -4,7 +4,7 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "test": "eslint && tsc",
-    "dev": "miniflare --watch --debug --upstream https://davidwbarratt.com",
+    "dev": "wrangler dev --host davidwbarratt.com",
     "build": "wrangler build",
     "deploy": "wrangler publish"
   },
@@ -14,8 +14,7 @@
     "tracking-query-params-registry": "github:mpchadwick/tracking-query-params-registry"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^3.3.0",
-    "@cloudflare/wrangler": "^1.15.0",
+    "@cloudflare/workers-types": "^4.20231010.0",
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-dsv": "^2.0.3",
     "@rollup/plugin-node-resolve": "^13.1.3",
@@ -30,9 +29,9 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.0.0",
-    "miniflare": "^2.1.0",
     "rollup": "^2.64.0",
     "rollup-plugin-terser": "^7.0.2",
-    "typescript": "^4.2.3"
+    "typescript": "^5.2.2",
+    "wrangler": "^3.13.1"
   }
 }
